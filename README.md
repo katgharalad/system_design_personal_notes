@@ -4,6 +4,12 @@
 
 # The System Design Primer
 
+Read all 20 topics as a [simplified HTML lecture book](book/index.html).
+
+The book is ready for Vercel. Import this repository as a static project. Keep the project root at the repository root. No build command or environment variables are required. The deployed root redirects to `/book/`.
+
+Local preview: run `python3 -m http.server 4173`, then open `http://127.0.0.1:4173/`.
+
 <p align="center">
   <img src="images/jj3A5N8.png">
   <br/>

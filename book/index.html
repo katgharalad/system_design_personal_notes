@@ -1,0 +1,2129 @@
+<!doctype html>
+<!--
+  Direction contract
+  THESIS: Put twenty system design topics into one ordered study path. Refuse the landing-page pattern, decorative hero, and marketing copy.
+  OWN-WORLD: Warm white paper, ink-black text, quiet blue navigation, and one orange accent for the current topic and source links. Use a plain system sans for interface text and a readable system serif for note prose.
+  STORY: The reader moves from system trade-offs to the network path, data and work, communication and trust, and interview practice. Each lecture states the idea, shows the path, maps it to AWS, asks a public interview question, and ends with a recall check.
+  FIRST VIEWPORT: Book title and study instructions at the top of the content column. A persistent chapter index sits on the left on wide screens. The first lecture starts after orientation.
+  FORM: Ordered lecture sequence with source notes, compact tables, semantic flow diagrams, AWS mapping, interview prompts, and native disclosure blocks. Staging: single-page book. Seed: not used; the brief fixes the reading form.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Twenty lecture notes from the System Design Primer, with public interview prompts and AWS mappings.">
+  <title>System Design Primer — A Field Book in 20 Lectures</title>
+  <style>
+    :root {
+      --paper: #f7f7f4;
+      --surface: #ffffff;
+      --ink: #17202a;
+      --muted: #52606d;
+      --rule: #d8dee4;
+      --nav: #24415c;
+      --accent: #c54b18;
+      --link: #135d86;
+      --focus: #0b6e99;
+      --soft-blue: #eef4f7;
+      --soft-orange: #fff3eb;
+      --shadow: 0 8px 24px rgba(23, 32, 42, 0.08);
+      --sans: Arial, Helvetica, sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      line-height: 1.55;
+    }
+    a { color: var(--link); }
+    a:hover { color: var(--accent); }
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+    img { max-width: 100%; height: auto; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .skip-link {
+      position: absolute;
+      left: 1rem;
+      top: -4rem;
+      z-index: 10;
+      padding: .65rem .8rem;
+      color: #fff;
+      background: var(--nav);
+    }
+    .skip-link:focus { top: 1rem; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid var(--rule);
+      backdrop-filter: blur(8px);
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: .8rem 1.25rem;
+    }
+    .wordmark {
+      color: var(--nav);
+      font-size: .9rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+    }
+    .search {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+    }
+    .search input {
+      width: min(28vw, 250px);
+      min-height: 2.25rem;
+      padding: .45rem .65rem;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+    }
+    .button {
+      min-height: 2.25rem;
+      padding: .45rem .7rem;
+      color: var(--nav);
+      background: var(--surface);
+      border: 1px solid var(--nav);
+      border-radius: 4px;
+    }
+    .button:hover {
+      color: #fff;
+      background: var(--nav);
+    }
+    .button--quiet { border-color: var(--rule); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 760px);
+      gap: clamp(2rem, 5vw, 5rem);
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 3.5rem 1.25rem 6rem;
+    }
+    .chapter-rail {
+      position: sticky;
+      top: 5.5rem;
+      align-self: start;
+      max-height: calc(100vh - 7rem);
+      overflow: auto;
+      padding-bottom: 1rem;
+    }
+    .rail-title {
+      margin: 0 0 .8rem;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .chapter-list {
+      display: grid;
+      gap: .25rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .chapter-list a {
+      display: block;
+      padding: .5rem .65rem;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.3;
+      text-decoration: none;
+      border-left: 2px solid transparent;
+    }
+    .chapter-list a:hover,
+    .chapter-list a[aria-current="true"] {
+      color: var(--nav);
+      background: var(--surface);
+      border-left-color: var(--accent);
+    }
+    .chapter-list .chapter-number {
+      display: inline-block;
+      width: 2rem;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    main { min-width: 0; }
+    .book-intro {
+      padding-bottom: 2.5rem;
+      border-bottom: 2px solid var(--nav);
+    }
+    h1, h2, h3, h4 {
+      color: var(--nav);
+      line-height: 1.15;
+    }
+    h1 {
+      max-width: 18ch;
+      margin: 0 0 1rem;
+      font-size: clamp(2.35rem, 4.5vw, 3.8rem);
+      letter-spacing: -.035em;
+    }
+    h2 {
+      margin: 0 0 .8rem;
+      font-size: clamp(1.85rem, 4vw, 2.8rem);
+      letter-spacing: -.025em;
+    }
+    h3 {
+      margin: 2.2rem 0 .6rem;
+      font-size: 1.25rem;
+    }
+    h4 {
+      margin: 1.5rem 0 .45rem;
+      font-size: 1rem;
+    }
+    p, ul, ol, table, pre, figure, blockquote { margin-top: 0; }
+    .lede {
+      max-width: 65ch;
+      margin: 0;
+      color: var(--muted);
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      line-height: 1.55;
+    }
+    .scope-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1rem;
+      margin: 1.4rem 0 0;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .scope-line strong { color: var(--ink); }
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 1.1rem;
+      margin-top: 2rem;
+    }
+    .plain-panel {
+      padding: 1rem 1.1rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    .plain-panel h3 { margin-top: 0; }
+    .plain-panel ol,
+    .plain-panel ul { margin-bottom: 0; padding-left: 1.25rem; }
+    .video-list {
+      display: grid;
+      gap: .8rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .video-list li {
+      padding-bottom: .8rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .video-list li:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+    .video-meta {
+      display: block;
+      margin-top: .2rem;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+    .caption-cues {
+      margin: .45rem 0 0;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .book-map {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .7rem;
+      margin-top: 1.1rem;
+    }
+    .book-map p {
+      margin: 0;
+      padding: .75rem;
+      color: var(--nav);
+      background: var(--soft-blue);
+      border: 1px solid #cbdce5;
+      font-size: .88rem;
+    }
+    .book-map strong {
+      display: block;
+      margin-bottom: .15rem;
+      color: var(--accent);
+      font-size: .76rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .part-break {
+      margin: 2.8rem 0 -1rem;
+      padding-top: 1rem;
+      color: var(--muted);
+      border-top: 2px solid var(--nav);
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .lecture {
+      scroll-margin-top: 6rem;
+      padding: 3rem 0 3.4rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .lecture:last-child { border-bottom: 0; }
+    .lecture-head {
+      display: grid;
+      grid-template-columns: 4rem 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    .lecture-index {
+      padding-top: .15rem;
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    .objective {
+      margin: 0 0 1.4rem;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+    .prose {
+      max-width: 72ch;
+      font-family: var(--serif);
+      font-size: 1.08rem;
+    }
+    .prose p,
+    .prose li { max-width: 72ch; }
+    .prose ul,
+    .prose ol { padding-left: 1.35rem; }
+    .prose strong { color: var(--ink); }
+    .core-idea {
+      margin: 1.5rem 0 2rem;
+      padding: 1rem 1.1rem;
+      background: var(--soft-orange);
+      border: 1px solid #e9c7b7;
+    }
+    .core-idea strong {
+      display: block;
+      margin-bottom: .35rem;
+      color: var(--accent);
+      font-family: var(--sans);
+      font-size: .82rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .flow-wrap {
+      margin: 1.5rem 0 2rem;
+      padding: 1rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    .flow-label {
+      margin: 0 0 .75rem;
+      color: var(--muted);
+      font-size: .88rem;
+      font-weight: 700;
+    }
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: .45rem;
+    }
+    .flow-step {
+      flex: 1 1 120px;
+      min-width: 110px;
+      padding: .65rem .75rem;
+      color: var(--nav);
+      background: var(--soft-blue);
+      border: 1px solid #cbdce5;
+      font-size: .92rem;
+      font-weight: 700;
+      text-align: center;
+    }
+    .flow-arrow {
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+    .flow-note {
+      flex-basis: 100%;
+      padding-top: .45rem;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .figure {
+      margin: 1.5rem 0 2rem;
+      padding: .8rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    .figure img {
+      display: block;
+      max-height: 360px;
+      margin: 0 auto;
+      object-fit: contain;
+    }
+    figcaption {
+      margin-top: .7rem;
+      color: var(--muted);
+      font-size: .88rem;
+    }
+    .figure-note {
+      margin-top: .3rem;
+      color: var(--ink);
+      font-size: .88rem;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.2rem 0 1.8rem;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: .93rem;
+    }
+    caption {
+      padding: .75rem 1rem .55rem;
+      color: var(--nav);
+      font-weight: 700;
+      text-align: left;
+    }
+    th, td {
+      padding: .65rem .8rem;
+      vertical-align: top;
+      border-top: 1px solid var(--rule);
+      text-align: left;
+    }
+    th {
+      color: var(--nav);
+      background: #f1f4f5;
+      font-size: .85rem;
+    }
+    code, pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+    code {
+      padding: .08rem .25rem;
+      background: #edf0f2;
+      border-radius: 3px;
+      font-size: .9em;
+    }
+    pre {
+      overflow-x: auto;
+      padding: .9rem 1rem;
+      color: #fff;
+      background: #20303d;
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+    .recall {
+      margin: 2rem 0 0;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    .recall summary {
+      padding: .8rem 1rem;
+      color: var(--nav);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .recall-body {
+      padding: 0 1rem 1rem;
+      border-top: 1px solid var(--rule);
+    }
+    .recall-body p:last-child { margin-bottom: 0; }
+    .sources {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--rule);
+    }
+    .sources h3 { margin-top: 0; }
+    .sources ol {
+      margin-bottom: 0;
+      padding-left: 1.25rem;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+    .sources li { padding: .22rem 0; }
+    .source-type {
+      color: var(--ink);
+      font-size: .82rem;
+    }
+    .study-check {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: .7rem;
+      margin: 1.5rem 0 0;
+    }
+    .aws-note,
+    .interview-question {
+      margin: 2rem 0 0;
+      padding: 1rem 1.1rem;
+      border: 1px solid var(--rule);
+    }
+    .aws-note {
+      background: var(--soft-blue);
+      border-color: #cbdce5;
+    }
+    .interview-question {
+      background: var(--soft-orange);
+      border-color: #e9c7b7;
+    }
+    .aws-note h3,
+    .interview-question h3 {
+      margin: 0 0 .55rem;
+      color: var(--nav);
+      font-size: 1.05rem;
+    }
+    .aws-note p,
+    .interview-question p { margin: .35rem 0; }
+    .aws-note p:last-child,
+    .interview-question p:last-child { margin-bottom: 0; }
+    .question-source {
+      color: var(--muted);
+      font-size: .86rem;
+    }
+    .check-item {
+      padding: .75rem;
+      background: var(--soft-blue);
+      border: 1px solid #cbdce5;
+      font-size: .92rem;
+    }
+    .check-item strong {
+      display: block;
+      margin-bottom: .2rem;
+      color: var(--nav);
+    }
+    .end-note {
+      margin-top: 2.5rem;
+      padding: 1.15rem;
+      background: var(--nav);
+      color: #fff;
+    }
+    .end-note h2 { color: #fff; }
+    .end-note a { color: #fff; }
+    .no-results {
+      display: none;
+      margin: 2rem 0;
+      padding: 1rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--rule);
+    }
+    .no-results.is-visible { display: block; }
+    .hidden-by-search { display: none; }
+
+    @media (max-width: 900px) {
+      .topbar-inner { align-items: flex-start; flex-direction: column; }
+      .top-actions { width: 100%; }
+      .search { flex: 1; }
+      .search input { width: 100%; }
+      .layout {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding-top: 2rem;
+      }
+      .chapter-rail {
+        position: static;
+        max-height: none;
+        padding: .75rem;
+        background: var(--surface);
+        border: 1px solid var(--rule);
+      }
+      .rail-title { margin-bottom: .5rem; }
+      .chapter-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .topbar-inner, .layout { padding-left: 1rem; padding-right: 1rem; }
+      .top-actions { align-items: stretch; flex-direction: column; }
+      .search { width: 100%; }
+      h1 { font-size: 2.45rem; }
+      .intro-grid,
+      .study-check,
+      .book-map { grid-template-columns: 1fr; }
+      .chapter-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .chapter-list a { font-size: .84rem; }
+      .lecture-head { grid-template-columns: 2.7rem 1fr; gap: .7rem; }
+      .lecture { padding-top: 2.5rem; }
+      .flow { display: grid; grid-template-columns: 1fr; }
+      .flow-arrow { transform: rotate(90deg); }
+      .flow-note { padding-top: 0; }
+    }
+    @media print {
+      body { background: #fff; }
+      .topbar, .chapter-rail, .search, .top-actions, .end-note { display: none !important; }
+      .layout { display: block; max-width: none; padding: 0; }
+      main { max-width: 72ch; margin: 0 auto; }
+      .book-intro { padding-top: 0; }
+      .lecture { break-inside: avoid; }
+      .figure, .plain-panel, .flow-wrap, .table-wrap, .recall, .aws-note, .interview-question { break-inside: avoid; }
+      a { color: inherit; text-decoration: underline; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to notes</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="wordmark" href="#top">SYSTEM DESIGN PRIMER / FIELD BOOK 01–20</a>
+      <div class="top-actions">
+        <form class="search" id="search-form" role="search">
+          <label class="sr-only" for="search-input">Search the lecture notes</label>
+          <input id="search-input" type="search" placeholder="Search notes" autocomplete="off">
+          <button class="button" type="submit">Find</button>
+          <button class="button button--quiet" id="clear-search" type="button">Clear</button>
+        </form>
+        <button class="button" id="print-notes" type="button">Print</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout" id="top">
+    <aside class="chapter-rail" aria-label="Lecture index">
+      <p class="rail-title">Contents · 20 lectures</p>
+      <ol class="chapter-list">
+        <li><a href="#lecture-01"><span class="chapter-number">01</span>Performance vs Scalability</a></li>
+        <li><a href="#lecture-02"><span class="chapter-number">02</span>Latency vs Throughput</a></li>
+        <li><a href="#lecture-03"><span class="chapter-number">03</span>Availability vs Consistency</a></li>
+        <li><a href="#lecture-04"><span class="chapter-number">04</span>Consistency Patterns</a></li>
+        <li><a href="#lecture-05"><span class="chapter-number">05</span>Availability Patterns</a></li>
+        <li><a href="#lecture-06"><span class="chapter-number">06</span>Domain Name System</a></li>
+        <li><a href="#lecture-07"><span class="chapter-number">07</span>Content Delivery Network</a></li>
+        <li><a href="#lecture-08"><span class="chapter-number">08</span>Load Balancer</a></li>
+        <li><a href="#lecture-09"><span class="chapter-number">09</span>Reverse Proxy</a></li>
+        <li><a href="#lecture-10"><span class="chapter-number">10</span>Application Layer</a></li>
+        <li><a href="#lecture-11"><span class="chapter-number">11</span>Database</a></li>
+        <li><a href="#lecture-12"><span class="chapter-number">12</span>Cache</a></li>
+        <li><a href="#lecture-13"><span class="chapter-number">13</span>Asynchronism</a></li>
+        <li><a href="#lecture-14"><span class="chapter-number">14</span>Communication</a></li>
+        <li><a href="#lecture-15"><span class="chapter-number">15</span>TCP vs UDP</a></li>
+        <li><a href="#lecture-16"><span class="chapter-number">16</span>RPC vs REST</a></li>
+        <li><a href="#lecture-17"><span class="chapter-number">17</span>Security</a></li>
+        <li><a href="#lecture-18"><span class="chapter-number">18</span>Estimation</a></li>
+        <li><a href="#lecture-19"><span class="chapter-number">19</span>Interview Method</a></li>
+        <li><a href="#lecture-20"><span class="chapter-number">20</span>Capstone Designs</a></li>
+      </ol>
+    </aside>
+
+    <main id="content">
+      <section class="book-intro" aria-labelledby="book-title">
+        <h1 id="book-title">System design, a field book in twenty lectures.</h1>
+        <p class="lede">A short, ordered book based on the System Design Primer. Learn the trade-offs first. Then follow a request through the network, application, data, and work layers.</p>
+        <p class="scope-line"><strong>Scope:</strong> 20 lecture topics, public interview exercises, and AWS mappings <span aria-hidden="true">·</span> <strong>Language:</strong> ASD / STE-100 style</p>
+
+        <div class="intro-grid">
+          <section class="plain-panel" aria-labelledby="use-book">
+            <h3 id="use-book">Use this book</h3>
+            <ol>
+              <li>Read the core idea.</li>
+              <li>Draw the request path.</li>
+              <li>State the main trade-off.</li>
+              <li>Answer the recall check without looking.</li>
+              <li>Answer the interview question on paper.</li>
+              <li>Map the design to AWS, then name one trade-off.</li>
+              <li>Open the sources for more detail.</li>
+            </ol>
+          </section>
+          <section class="plain-panel" aria-labelledby="video-sources">
+            <h3 id="video-sources">Video sources with captions</h3>
+            <ul class="video-list">
+              <li>
+                <a href="https://www.youtube.com/watch?v=-W9F__D3oY4&amp;cc_load_policy=1" target="_blank" rel="noopener">Harvard scalability lecture</a>
+                <span class="video-meta">English auto-generated captions found. Use the captions while reviewing vertical scaling, horizontal scaling, caching, load balancing, replication, and partitioning.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=k-Yaq8AHlFA&amp;cc_load_policy=1" target="_blank" rel="noopener">The CAP theorem</a>
+                <span class="video-meta">English caption track found. This is the main video for Lecture 03.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=srOgpXECblk&amp;cc_load_policy=1" target="_blank" rel="noopener">Transactions Across Datacenters</a>
+                <span class="video-meta">English caption tracks found. Use this for Lecture 04 and the consistency trade-offs.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=ZgdS0EUmn70&amp;cc_load_policy=1" target="_blank" rel="noopener">Intro to Architecture and Systems Design Interviews</a>
+                <span class="video-meta">English auto-generated captions found. Use this for the repository's interview process orientation.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=kKjm4ehYiMs&amp;cc_load_policy=1" target="_blank" rel="noopener">AWS re:Invent: Scaling up to your first 10 million users</a>
+                <span class="video-meta">English auto-generated captions found. Use for Lectures 01, 05, 08, 10, and 20.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=qI_g07C_Q5I&amp;cc_load_policy=1" target="_blank" rel="noopener">Introduction to NoSQL</a>
+                <span class="video-meta">English auto-generated captions found. Use for Lecture 11.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=1KRYH75wgy4&amp;cc_load_policy=1" target="_blank" rel="noopener">It’s All a Numbers Game</a>
+                <span class="video-meta">English auto-generated captions found. Use for Lecture 18.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=PE4gwstWhmc&amp;cc_load_policy=1" target="_blank" rel="noopener">How We’ve Scaled Dropbox</a>
+                <span class="video-meta">English auto-generated captions found. Use for Lectures 07, 11, 13, and 20.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=5cKTP36HVgI&amp;cc_load_policy=1" target="_blank" rel="noopener">Big and Small Data at Twitter</a>
+                <span class="video-meta">English auto-generated captions found. Use for Lectures 11, 12, and 19.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=w5WVu624fY8&amp;cc_load_policy=1" target="_blank" rel="noopener">YouTube Scalability</a>
+                <span class="video-meta">English auto-generated captions found. Use for Lectures 07, 08, and 20.</span>
+              </li>
+              <li>
+                <a href="https://www.youtube.com/watch?v=z8LU0Cj6BOU&amp;cc_load_policy=1" target="_blank" rel="noopener">Operations at Twitter: Scaling Beyond 100 Million Users</a>
+                <span class="video-meta">English auto-generated captions found. Use for Lectures 05, 08, and 19.</span>
+              </li>
+            </ul>
+          </section>
+        </div>
+        <div class="book-map" aria-label="Book parts">
+          <p><strong>Part I · 01–05</strong>Trade-offs and failure</p>
+          <p><strong>Part II · 06–10</strong>Request path and services</p>
+          <p><strong>Part III · 11–13</strong>Data, cache, and work</p>
+          <p><strong>Part IV · 14–17</strong>Communication and trust</p>
+          <p><strong>Part V · 18–20</strong>Estimation and interview practice</p>
+        </div>
+        <p class="caption-cues">Caption notes are paraphrases. Full captions stay on the linked video page.</p>
+      </section>
+
+      <p class="no-results" id="no-results" role="status">No lecture matches this search. Clear the search and try one term.</p>
+
+      <p class="part-break">Part I · Trade-offs and failure</p>
+      <article class="lecture" id="lecture-01" data-topic="performance scalability vertical horizontal resources capacity">
+        <div class="lecture-head">
+          <div class="lecture-index">01</div>
+          <div>
+            <h2>Performance vs Scalability</h2>
+            <p class="objective">Learning objective: Tell a slow-system problem from a growth-under-load problem.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>Performance is the work done by one system under one load. Scalability is how performance changes when resources or load change.</div>
+        <div class="prose">
+          <p>A performance problem exists when one request takes too much time. A scalability problem exists when the system works for one user but fails under a larger load.</p>
+          <p>A scalable design gains useful capacity when you add resources. The gain does not need to be perfect. The design must avoid a new shared bottleneck.</p>
+          <p>Ask which axis will grow. The axis can be request rate, data size, number of users, or geographic distance.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A system receives work, gets measured, adds resources, and is measured again.">
+          <p class="flow-label">Diagnosis path</p>
+          <div class="flow">
+            <div class="flow-step">Workload</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Measure one system</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Add resources</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Measure capacity</div>
+            <div class="flow-note">If the added resource does not add useful capacity, find the shared bottleneck.</div>
+          </div>
+        </div>
+        <h3>Terms</h3>
+        <div class="table-wrap">
+          <table>
+            <caption>Four terms to keep separate</caption>
+            <thead><tr><th>Term</th><th>Meaning</th><th>Typical action</th></tr></thead>
+            <tbody>
+              <tr><td>Performance</td><td>How much work the system completes, and how fast it completes it.</td><td>Reduce work or improve the slow path.</td></tr>
+              <tr><td>Scalability</td><td>How system performance changes as resources or load increase.</td><td>Remove shared bottlenecks and scale the right part.</td></tr>
+              <tr><td>Vertical scaling</td><td>Use a larger machine.</td><td>Add CPU, memory, storage, or network capacity to one node.</td></tr>
+              <tr><td>Horizontal scaling</td><td>Use more machines.</td><td>Split work across nodes. Keep shared state outside workers when possible.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Small example</h3>
+        <div class="prose">
+          <p>An API takes 300 ms with one request. It takes 3 seconds with 1,000 requests per second. The single-request performance is acceptable. The system has a scalability problem.</p>
+          <p>An API takes 3 seconds with one request. It takes 3 seconds with ten requests per second. The main problem is performance. Scaling out may not fix the slow request.</p>
+        </div>
+        <div class="study-check">
+          <div class="check-item"><strong>Ask</strong>Which workload axis grows?</div>
+          <div class="check-item"><strong>Measure</strong>What changes after a resource is added?</div>
+          <div class="check-item"><strong>Find</strong>Which component stays shared?</div>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-01">
+          <h3 id="aws-01">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon EC2 for compute, an Application Load Balancer for traffic, and EC2 Auto Scaling for horizontal capacity.</p>
+          <p><strong>Inside AWS:</strong> Set a target metric, add instances in more than one Availability Zone, and measure latency, error rate, and saturation with CloudWatch.</p>
+          <p><strong>Watch:</strong> More instances do not fix a slow query or a shared database bottleneck. Test the complete request path.</p>
+          <p><a href="https://docs.aws.amazon.com/wellarchitected/latest/performance-efficiency-pillar/welcome.html" target="_blank" rel="noopener">AWS Performance Efficiency Pillar</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-01">
+          <h3 id="question-01">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a system that scales to millions of users on AWS. Start with one service. Show what changes when traffic grows.</p>
+          <p><strong>Look for:</strong> A measured bottleneck, a scale-out step, stateless workers, and a plan for shared state.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/scaling_aws" target="_blank" rel="noopener">System Design Primer · Scaling on AWS</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>A service is fast for one user but slow for many users. Which problem is likely?</p><p><strong>Answer:</strong> A scalability problem.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="http://www.allthingsdistributed.com/2006/03/a_word_on_scalability.html" target="_blank" rel="noopener">A Word on Scalability</a> by Werner Vogels.</li>
+            <li><span class="source-type">Repository source:</span> <a href="http://www.slideshare.net/jboner/scalability-availability-stability-patterns/" target="_blank" rel="noopener">Scalability, Availability, Stability, Patterns</a>.</li>
+            <li><span class="source-type">Video source:</span> <a href="https://www.youtube.com/watch?v=-W9F__D3oY4&amp;cc_load_policy=1" target="_blank" rel="noopener">Harvard scalability lecture with captions</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-17" data-topic="security authentication authorization tls encryption secrets iam cognito kms waf rate limiting">
+        <div class="lecture-head">
+          <div class="lecture-index">17</div>
+          <div>
+            <h2>Security</h2>
+            <p class="objective">Learning objective: Protect identity, data, and service boundaries in the request path.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>Authentication answers who the caller is. Authorization answers what the caller may do. Encryption protects data in transit and at rest.</div>
+        <div class="prose">
+          <p>Use least privilege. Give a component only the permissions it needs. Separate user identity from service identity. Record security events without recording secrets.</p>
+          <p>Use TLS for data in transit. Hash passwords with a password hashing function. Encrypt sensitive data at rest. Store secrets in a managed secret store, not in source code.</p>
+          <p>Validate input at every trust boundary. Add rate limits and abuse controls. A firewall can reduce traffic. The application must still enforce authorization.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A client sends a request over TLS. An identity is checked, permission is checked, input is validated, and the service reads protected data.">
+          <p class="flow-label">Security path</p>
+          <div class="flow">
+            <div class="flow-step">TLS request</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Authenticate</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Authorize</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Validate + act</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Security controls</caption>
+            <thead><tr><th>Control</th><th>Protects</th><th>Design question</th></tr></thead>
+            <tbody>
+              <tr><td>Authentication</td><td>Account identity.</td><td>How is identity issued, renewed, and revoked?</td></tr>
+              <tr><td>Authorization</td><td>Resource and action access.</td><td>Can this identity perform this action on this resource?</td></tr>
+              <tr><td>Encryption</td><td>Data from observers.</td><td>Where are keys stored and rotated?</td></tr>
+              <tr><td>Rate limit</td><td>Availability and abuse surface.</td><td>Which identity, IP, or resource gets a limit?</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-17">
+          <h3 id="aws-17">AWS mapping</h3>
+          <p><strong>Use:</strong> AWS IAM for service permissions, Amazon Cognito for user identity, AWS KMS for encryption keys, and AWS WAF for request filtering and rate controls.</p>
+          <p><strong>Inside AWS:</strong> Use IAM roles instead of long-lived keys. Encrypt storage and queues. Put secrets in Secrets Manager or Systems Manager Parameter Store. Log access and denied actions.</p>
+          <p><strong>Watch:</strong> A WAF rule is not authorization. The service must check the caller's permission for the requested object and action.</p>
+          <p><a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html" target="_blank" rel="noopener">AWS Security Pillar</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-17">
+          <h3 id="question-17">Interview question</h3>
+          <p><strong>Prompt:</strong> Design Mint.com. How do you protect account credentials and financial data while still allowing safe aggregation and support access?</p>
+          <p><strong>Look for:</strong> Authentication, authorization, encryption, key handling, audit logs, token scope, rate limits, and data minimization.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/mint" target="_blank" rel="noopener">System Design Primer · Mint.com</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What is the difference between authentication and authorization?</p><p><strong>Answer:</strong> Authentication identifies the caller. Authorization checks the caller's allowed action.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#security" target="_blank" rel="noopener">System Design Primer · Security</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/mint" target="_blank" rel="noopener">Design Mint.com</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html" target="_blank" rel="noopener">AWS Security Pillar</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <p class="part-break">Part V · Estimation and interview practice</p>
+      <article class="lecture" id="lecture-18" data-topic="back of envelope estimation qps storage bandwidth powers of two latency capacity cost">
+        <div class="lecture-head">
+          <div class="lecture-index">18</div>
+          <div>
+            <h2>Back-of-Envelope Estimation</h2>
+            <p class="objective">Learning objective: Turn a product statement into rough traffic, storage, and capacity numbers.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>An estimate exposes scale assumptions. It does not need exact values. It must show units and order of magnitude.</div>
+        <div class="prose">
+          <p>Start with users, active fraction, actions per user, peak multiplier, payload size, and retention. Convert the values to requests per second, bytes per second, and bytes stored.</p>
+          <p>Separate average from peak. Separate reads from writes. Add replication, indexes, metadata, and headroom. State what the estimate does not include.</p>
+        </div>
+        <pre><code>requests/second = active users × actions/user/second
+storage         = writes/second × bytes/write × retention
+bandwidth       = requests/second × average payload</code></pre>
+        <div class="table-wrap">
+          <table>
+            <caption>Estimate checklist</caption>
+            <thead><tr><th>Value</th><th>Example question</th><th>Use</th></tr></thead>
+            <tbody>
+              <tr><td>Users</td><td>How many total and active users?</td><td>Base workload.</td></tr>
+              <tr><td>Rate</td><td>How many reads and writes per active user?</td><td>QPS and worker capacity.</td></tr>
+              <tr><td>Size</td><td>How large is one request or record?</td><td>Bandwidth and storage.</td></tr>
+              <tr><td>Retention</td><td>How long do records remain?</td><td>Total storage and deletion work.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Use powers of two as a memory aid: 1 KB is about 1,000 bytes, 1 MB is about 1,000 KB, and 1 GB is about 1,000 MB for a rough interview estimate. Keep the same unit through the calculation.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-18">
+          <h3 id="aws-18">AWS mapping</h3>
+          <p><strong>Use:</strong> AWS Pricing Calculator for a cost model, CloudWatch for observed workload, and Service Quotas for service limits.</p>
+          <p><strong>Inside AWS:</strong> Convert QPS and storage estimates into instance count, database capacity, queue consumers, object storage, and transfer. Then compare the estimate with measured metrics.</p>
+          <p><strong>Watch:</strong> An AWS service quota is not the same as a performance target. Load test the path and monitor the bottleneck.</p>
+          <p><a href="https://calculator.aws/" target="_blank" rel="noopener">AWS Pricing Calculator</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-18">
+          <h3 id="question-18">Interview question</h3>
+          <p><strong>Prompt:</strong> Design Amazon's sales ranking by category feature. Estimate event rate, ranking storage, update delay, and read traffic.</p>
+          <p><strong>Look for:</strong> A stated unit, peak factor, batch or stream choice, approximate storage, and a result that can be checked.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/sales_rank" target="_blank" rel="noopener">System Design Primer · Sales ranking</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>Why estimate peak traffic separately from average traffic?</p><p><strong>Answer:</strong> Capacity must handle the high period even when average traffic is lower.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#back-of-the-envelope-estimations" target="_blank" rel="noopener">System Design Primer · Back-of-the-envelope estimations</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/sales_rank" target="_blank" rel="noopener">Design Amazon's sales ranking by category</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://calculator.aws/" target="_blank" rel="noopener">AWS Pricing Calculator</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <p class="part-break">Part IV · Communication and trust</p>
+      <article class="lecture" id="lecture-14" data-topic="communication http https tls headers status codes web sockets stateless protocol api">
+        <div class="lecture-head">
+          <div class="lecture-index">14</div>
+          <div>
+            <h2>Communication</h2>
+            <p class="objective">Learning objective: Define a request contract and the failure behavior between client and service.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>A communication protocol defines how two components name work, carry data, report success, and report failure.</div>
+        <div class="prose">
+          <p>HTTP uses a method, a target, headers, and an optional body. A response uses a status code, headers, and an optional body. The client and service must agree on these fields.</p>
+          <p>Keep a request id across the path. Set connection, request, and dependency timeouts. Return an error that the caller can act on. Retry only an operation that is safe to retry.</p>
+          <p>HTTP is often stateless at the protocol layer. The service can still use a session token or a shared session store. Stateless workers make scale-out easier.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A client sends an HTTP request with a method and headers. A service validates it, performs work, and returns a status, headers, and body.">
+          <p class="flow-label">Request contract</p>
+          <div class="flow">
+            <div class="flow-step">Method + path</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Headers + body</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Service work</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Status + body</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Communication decisions</caption>
+            <thead><tr><th>Decision</th><th>Example</th><th>Reason</th></tr></thead>
+            <tbody>
+              <tr><td>Timeout</td><td>Stop waiting after a stated limit.</td><td>Prevents one dependency from holding all workers.</td></tr>
+              <tr><td>Retry</td><td>Retry a safe, transient failure with backoff.</td><td>Improves recovery without multiplying load.</td></tr>
+              <tr><td>Idempotency key</td><td>Repeat a payment request without creating two payments.</td><td>Gives a request a stable identity.</td></tr>
+              <tr><td>Version</td><td>Accept old and new fields during a migration.</td><td>Lets clients and services change at different times.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-14">
+          <h3 id="aws-14">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon API Gateway for managed public HTTP APIs. Use an Application Load Balancer when HTTP routing to targets is the main need.</p>
+          <p><strong>Inside AWS:</strong> Define routes, authentication, throttling, request validation, timeouts, and access logs. Put the service behind private networking when the public edge is separate.</p>
+          <p><strong>Watch:</strong> API Gateway can reject a request before the application. Expose useful status codes and request ids so clients can recover.</p>
+          <p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html" target="_blank" rel="noopener">Amazon API Gateway Developer Guide</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-14">
+          <h3 id="question-14">Interview question</h3>
+          <p><strong>Prompt:</strong> Design Pastebin.com or Bit.ly. Define the create-short-link and resolve-short-link APIs. What happens when a client retries?</p>
+          <p><strong>Look for:</strong> Resource names, status codes, idempotency, redirects, rate limits, and versioning.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/pastebin" target="_blank" rel="noopener">System Design Primer · Pastebin / Bit.ly</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>Why is an idempotency key useful?</p><p><strong>Answer:</strong> It lets the service recognize a repeated request and avoid applying the same operation twice.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#communication" target="_blank" rel="noopener">System Design Primer · Communication</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/pastebin" target="_blank" rel="noopener">Design Pastebin.com or Bit.ly</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html" target="_blank" rel="noopener">Amazon API Gateway</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-15" data-topic="tcp udp transport connection ordering retransmission congestion latency realtime chat load balancer">
+        <div class="lecture-head">
+          <div class="lecture-index">15</div>
+          <div>
+            <h2>TCP vs UDP</h2>
+            <p class="objective">Learning objective: Select a transport from the cost of loss, ordering, and connection setup.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>TCP gives an ordered, reliable byte stream. UDP sends datagrams without the same delivery and ordering guarantee.</div>
+        <div class="prose">
+          <p>TCP retransmits lost data and controls the sending rate. This is useful when every byte matters. It adds connection state and can wait for missing data.</p>
+          <p>UDP lets the application choose what to do with loss and ordering. This is useful when a new update is more useful than an old update, such as some voice, video, and game traffic.</p>
+          <p>The transport is only one part of the design. The application still needs timeouts, authentication, rate limits, and a failure policy.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A reliable TCP path sends data, detects loss, and retransmits. A UDP path sends a datagram and lets the application decide how to handle loss.">
+          <p class="flow-label">Transport choice</p>
+          <div class="flow">
+            <div class="flow-step">Application data</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">TCP: ordered stream</div><div class="flow-arrow" aria-hidden="true">or</div>
+            <div class="flow-step">UDP: datagram</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Application policy</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>TCP and UDP</caption>
+            <thead><tr><th>Property</th><th>TCP</th><th>UDP</th></tr></thead>
+            <tbody>
+              <tr><td>Delivery</td><td>Reliable retransmission by the transport.</td><td>Best effort. Application decides.</td></tr>
+              <tr><td>Ordering</td><td>Ordered byte stream.</td><td>No ordered stream.</td></tr>
+              <tr><td>Use</td><td>Web, APIs, files, and database connections.</td><td>Some real-time media, discovery, and telemetry.</td></tr>
+              <tr><td>Cost</td><td>Connection and control state.</td><td>More application work for reliability.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-15">
+          <h3 id="aws-15">AWS mapping</h3>
+          <p><strong>Use:</strong> A Network Load Balancer for TCP or UDP targets. Use AWS Global Accelerator when global entry points and fast regional failover matter.</p>
+          <p><strong>Inside AWS:</strong> Define listeners and target health checks. Place tasks or instances in multiple Availability Zones. Track connection count, new connections, and target errors.</p>
+          <p><strong>Watch:</strong> A UDP listener does not make the application reliable. Add sequence numbers, expiry, or application acknowledgements when required.</p>
+          <p><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html" target="_blank" rel="noopener">AWS Network Load Balancer</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-15">
+          <h3 id="question-15">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a chat server. Which traffic needs ordered delivery, and which traffic can use a lower-latency transport?</p>
+          <p><strong>Look for:</strong> Message durability, reconnect behavior, ordering scope, presence state, fan-out, and abuse control.</p>
+          <p class="question-source">Public design exercise listed by the <a href="https://github.com/donnemartin/system-design-primer#object-oriented-design-interview-questions-with-solutions" target="_blank" rel="noopener">System Design Primer</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>When is UDP a reasonable choice?</p><p><strong>Answer:</strong> When the application can tolerate or repair loss and a fresh update is more useful than an old one.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#tcp-and-udp" target="_blank" rel="noopener">System Design Primer · TCP and UDP</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer#object-oriented-design-interview-questions-with-solutions" target="_blank" rel="noopener">Design a chat server</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html" target="_blank" rel="noopener">AWS Network Load Balancer</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-16" data-topic="rpc rest api design grpc protocol contract versioning serialization service communication">
+        <div class="lecture-head">
+          <div class="lecture-index">16</div>
+          <div>
+            <h2>RPC vs REST</h2>
+            <p class="objective">Learning objective: Choose a service interface that keeps the contract clear for its callers.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>REST models resources and uses HTTP semantics. RPC models operations and calls named methods. Both need a precise contract.</div>
+        <div class="prose">
+          <p>REST works well for public APIs with resources, standard methods, cache rules, and human-readable requests. RPC can make internal calls explicit and efficient with a typed schema.</p>
+          <p>Use an interface definition. State field types, required fields, error codes, timeout behavior, and compatibility rules. A service contract is a dependency.</p>
+          <p>Do not choose by label alone. Measure payload size, call count, latency, client variety, and the need for streaming.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A caller uses a versioned contract. A REST path names a resource, or an RPC path names an operation. The service returns a typed result or error.">
+          <p class="flow-label">Service interface</p>
+          <div class="flow">
+            <div class="flow-step">Caller</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Versioned contract</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">REST resource / RPC method</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Result or error</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Interface choice</caption>
+            <thead><tr><th>Question</th><th>REST</th><th>RPC</th></tr></thead>
+            <tbody>
+              <tr><td>What is named?</td><td>Resource and HTTP method.</td><td>Operation and typed arguments.</td></tr>
+              <tr><td>Best fit</td><td>Public and varied clients.</td><td>Controlled internal clients and high call volume.</td></tr>
+              <tr><td>Important control</td><td>HTTP semantics and cache rules.</td><td>Schema and generated client compatibility.</td></tr>
+              <tr><td>Common error</td><td>Endpoints become actions with unclear semantics.</td><td>Internal method changes break older callers.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-16">
+          <h3 id="aws-16">AWS mapping</h3>
+          <p><strong>Use:</strong> API Gateway REST or HTTP APIs for public interfaces. Run gRPC services on ECS or EKS behind an Application Load Balancer or Network Load Balancer as the protocol needs.</p>
+          <p><strong>Inside AWS:</strong> Register service names with Cloud Map when callers need discovery. Use IAM or a service identity. Set connection, request, and dependency timeouts.</p>
+          <p><strong>Watch:</strong> A managed gateway does not define a good contract. Keep schemas, version rules, and error behavior in the service code and documentation.</p>
+          <p><a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html" target="_blank" rel="noopener">API Gateway HTTP APIs and REST APIs</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-16">
+          <h3 id="question-16">Interview question</h3>
+          <p><strong>Prompt:</strong> Design Google Docs. Which calls are public REST operations, which are internal RPC calls, and how do clients stay compatible during an edit?</p>
+          <p><strong>Look for:</strong> Document state, edit ordering, presence, conflict handling, streaming or push updates, and contract versioning.</p>
+          <p class="question-source">Public prompt listed by the <a href="https://github.com/donnemartin/system-design-primer#additional-system-design-interview-questions" target="_blank" rel="noopener">System Design Primer</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What must every RPC or REST interface define?</p><p><strong>Answer:</strong> Inputs, outputs, errors, timeout behavior, and compatibility rules.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#restful-api" target="_blank" rel="noopener">System Design Primer · RESTful API</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer#additional-system-design-interview-questions" target="_blank" rel="noopener">Design Google Docs</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html" target="_blank" rel="noopener">API Gateway HTTP APIs and REST APIs</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <p class="part-break">Part III · Data, cache, and work</p>
+      <article class="lecture" id="lecture-11" data-topic="database sql nosql relational non-relational index replica shard partition transaction data">
+        <div class="lecture-head">
+          <div class="lecture-index">11</div>
+          <div>
+            <h2>Database</h2>
+            <p class="objective">Learning objective: Choose a data store from the data model, access pattern, and correctness rule.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>A database choice follows the data and the query. Start with reads, writes, relationships, scale, and failure behavior.</div>
+        <div class="prose">
+          <p>A relational database stores structured rows and relationships. SQL gives joins and transactions. A non-relational database can use a document, key-value, column, or graph model. It can scale well for known access patterns.</p>
+          <p>An index makes a query faster by storing a structure for lookup. The index uses storage and makes writes slower. Add an index for a measured query.</p>
+          <p>A replica copies data. A shard splits data. Replicas help read scale and recovery. Shards help write and storage scale. Both add routing and operational work.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A request is mapped to a query, an index or partition is selected, data is read or written, and replicas receive changes.">
+          <p class="flow-label">Database decision path</p>
+          <div class="flow">
+            <div class="flow-step">Request</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Query pattern</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Index / partition</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Data store</div>
+            <div class="flow-note">Write path: validate, commit, and replicate. Read path: select a permitted replica and return a result.</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Database choice</caption>
+            <thead><tr><th>Need</th><th>Possible fit</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td>Joins and multi-row transactions</td><td>Relational database</td><td>Scale-out writes can be harder.</td></tr>
+              <tr><td>Known key and range access</td><td>Key-value or wide-column store</td><td>Ad hoc queries are limited.</td></tr>
+              <tr><td>Read scale from one source</td><td>Read replicas</td><td>Replica lag can produce stale reads.</td></tr>
+              <tr><td>Data and write scale exceed one node</td><td>Sharding or a distributed database</td><td>Cross-shard queries and transactions cost more.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Write the access patterns before the schema. For a feed, ask for posts by user, posts by time, and posts for a follower. For financial data, ask where atomicity and audit history are required.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-11">
+          <h3 id="aws-11">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon Aurora or Amazon RDS for relational data. Use DynamoDB for key-value or document access with a known partition key.</p>
+          <p><strong>Inside AWS:</strong> Add Aurora readers for read scale. Use a writer endpoint and reader endpoints. In DynamoDB, design the partition key, sort key, and capacity around the query.</p>
+          <p><strong>Watch:</strong> A read replica does not remove write limits. A DynamoDB partition key with hot values can still create a bottleneck.</p>
+          <p><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.AuroraHighAvailability.html" target="_blank" rel="noopener">Amazon Aurora high availability</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-11">
+          <h3 id="question-11">Interview question</h3>
+          <p><strong>Prompt:</strong> Design Mint.com. Which data belongs in a relational database, which queries need indexes, and where can reads be stale?</p>
+          <p><strong>Look for:</strong> User and account data, transaction history, aggregation jobs, privacy, auditability, and the read/write path.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/mint" target="_blank" rel="noopener">System Design Primer · Mint.com</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What is the difference between a replica and a shard?</p><p><strong>Answer:</strong> A replica copies the same data. A shard holds one part of the data.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#databases" target="_blank" rel="noopener">System Design Primer · Databases</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/mint" target="_blank" rel="noopener">Design Mint.com</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.AuroraHighAvailability.html" target="_blank" rel="noopener">Amazon Aurora high availability</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-12" data-topic="cache cache-aside write-through ttl eviction invalidation redis memcached stampede">
+        <div class="lecture-head">
+          <div class="lecture-index">12</div>
+          <div>
+            <h2>Cache</h2>
+            <p class="objective">Learning objective: Use a cache to reduce repeated work while keeping stale data safe.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>A cache is a faster copy of data. The source of truth stays in durable storage.</div>
+        <div class="prose">
+          <p>In cache-aside mode, the application reads the cache first. On a miss, it reads the database and writes the result to the cache. On a write, it updates the database and removes or updates the cache entry.</p>
+          <p>Every entry needs a key, a value, a TTL, and an eviction rule. The cache key must include every input that changes the response.</p>
+          <p>Many misses at one time can overload the database. Add request coalescing, jittered expiry, a stale value policy, or a warm-up step when the risk is real.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A client asks a cache. A hit returns a value. A miss asks the database and then fills the cache.">
+          <p class="flow-label">Cache-aside path</p>
+          <div class="flow">
+            <div class="flow-step">Client</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Cache</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Hit: return</div>
+            <div class="flow-note">Miss: read the database, return the value, and store it with a bounded TTL.</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Cache controls</caption>
+            <thead><tr><th>Control</th><th>Question</th><th>Failure if missing</th></tr></thead>
+            <tbody>
+              <tr><td>Key</td><td>Which request inputs identify one value?</td><td>Wrong data is returned.</td></tr>
+              <tr><td>TTL</td><td>How long may the value be stale?</td><td>Old data remains too long.</td></tr>
+              <tr><td>Eviction</td><td>Which item leaves when memory is full?</td><td>Useful items are removed or memory fills.</td></tr>
+              <tr><td>Invalidation</td><td>How does a write remove old data?</td><td>Reads return a value that should be changed.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>A cache improves latency and reduces database work. It also creates a second state. State the allowed staleness and the behavior when the cache is empty or unavailable.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-12">
+          <h3 id="aws-12">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon ElastiCache for Redis or Memcached. Use CloudFront for edge content. Use DynamoDB Accelerator only when its access pattern fits.</p>
+          <p><strong>Inside AWS:</strong> Use a cache-aside client with a bounded TTL. Size nodes for memory and network. Add replication and automatic failover when the cache failure path is defined.</p>
+          <p><strong>Watch:</strong> ElastiCache is not the durable source of truth. Decide whether a cache outage means slower reads, rejected writes, or reduced features.</p>
+          <p><a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html" target="_blank" rel="noopener">Amazon ElastiCache</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-12">
+          <h3 id="question-12">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a key-value store for a search engine. How do you cache popular queries and stop one expired key from causing a database storm?</p>
+          <p><strong>Look for:</strong> Cache key, TTL, eviction, negative results, invalidation, stampede control, and a source of truth.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/query_cache" target="_blank" rel="noopener">System Design Primer · Key-value store</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What must happen after a database write when the old value is cached?</p><p><strong>Answer:</strong> Update or invalidate the cache entry according to the correctness rule.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#cache" target="_blank" rel="noopener">System Design Primer · Cache</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/query_cache" target="_blank" rel="noopener">Design a key-value store for a search engine</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html" target="_blank" rel="noopener">Amazon ElastiCache</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-13" data-topic="asynchronism asynchronous queue worker job retry idempotency dead letter sqs sns eventbridge">
+        <div class="lecture-head">
+          <div class="lecture-index">13</div>
+          <div>
+            <h2>Asynchronism</h2>
+            <p class="objective">Learning objective: Move slow or independent work off the user request path.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>Asynchronous work lets a producer continue before a consumer finishes. A queue holds work between the two.</div>
+        <div class="prose">
+          <p>The producer writes a message. A worker reads the message and performs the job. The producer does not need to wait for the worker.</p>
+          <p>Asynchronism adds delay and delivery uncertainty. A message may be delivered more than once. The worker must be idempotent, or it must use a deduplication rule.</p>
+          <p>Set a visibility timeout, retry limit, and dead-letter path. Monitor queue depth and oldest message age. These values show whether work is keeping up.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A producer writes a job to a queue. A worker receives the job, succeeds or retries, and sends failed jobs to a dead-letter queue.">
+          <p class="flow-label">Job path</p>
+          <div class="flow">
+            <div class="flow-step">Producer</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Queue</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Worker</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Success / retry / dead letter</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Queue decisions</caption>
+            <thead><tr><th>Decision</th><th>Reason</th><th>Failure control</th></tr></thead>
+            <tbody>
+              <tr><td>Message size and schema</td><td>Keep work clear and versionable.</td><td>Reject invalid messages.</td></tr>
+              <tr><td>Delivery model</td><td>At-most-once, at-least-once, or stronger behavior.</td><td>Make consumers idempotent.</td></tr>
+              <tr><td>Retry policy</td><td>Transient failures may recover.</td><td>Use backoff and a retry limit.</td></tr>
+              <tr><td>Dead-letter queue</td><td>Keep poison messages from blocking work.</td><td>Inspect, repair, and replay safely.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Return an accepted response only when the system has stored the job durably enough for the requirement. A queue is not a promise that the job has finished.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-13">
+          <h3 id="aws-13">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon SQS for queues, Amazon SNS for fan-out, Amazon EventBridge for event routing, and AWS Step Functions for visible workflows.</p>
+          <p><strong>Inside AWS:</strong> Configure visibility timeout, redrive policy, dead-letter queue, encryption, and CloudWatch alarms. Scale consumers from queue depth and message age.</p>
+          <p><strong>Watch:</strong> SQS standard queues provide at-least-once delivery. Design the consumer so duplicate processing is safe.</p>
+          <p><a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html" target="_blank" rel="noopener">Amazon SQS Developer Guide</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-13">
+          <h3 id="question-13">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a web crawler. How do you distribute URLs to workers, limit work per host, retry failures, and avoid crawling one URL twice?</p>
+          <p><strong>Look for:</strong> Durable queue, URL normalization, deduplication, per-host fairness, idempotent storage, and a dead-letter path.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/web_crawler" target="_blank" rel="noopener">System Design Primer · Web crawler</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>Why must a queue consumer expect duplicate messages?</p><p><strong>Answer:</strong> Many distributed queues use at-least-once delivery. A retry can deliver a message again.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#asynchronism" target="_blank" rel="noopener">System Design Primer · Asynchronism</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/web_crawler" target="_blank" rel="noopener">Design a web crawler</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html" target="_blank" rel="noopener">Amazon SQS Developer Guide</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-02" data-topic="latency throughput time rate pipeline">
+        <div class="lecture-head">
+          <div class="lecture-index">02</div>
+          <div>
+            <h2>Latency vs Throughput</h2>
+            <p class="objective">Learning objective: Measure time per result and results per unit of time as different values.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>Latency is the time for one action. Throughput is the number of actions completed in a unit of time.</div>
+        <div class="prose">
+          <p>Latency answers: “How long does this request take?” Throughput answers: “How many requests finish each second?”</p>
+          <p>A system can have high throughput and high latency. A batch system can process many jobs per hour while each job waits a long time.</p>
+          <p>Set a latency limit that users can accept. Then increase throughput without crossing that limit.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="Latency measures one request from start to finish. Throughput measures many completed requests over time.">
+          <p class="flow-label">Two measurements of one pipeline</p>
+          <div class="flow">
+            <div class="flow-step">Request starts</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Work runs</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Response returns</div>
+            <div class="flow-note">Latency is the length of this path. Throughput is the number of completed paths per second.</div>
+          </div>
+        </div>
+        <h3>Terms</h3>
+        <div class="table-wrap">
+          <table>
+            <caption>Time and rate</caption>
+            <thead><tr><th>Term</th><th>Unit</th><th>Question</th></tr></thead>
+            <tbody>
+              <tr><td>Latency</td><td>Milliseconds, seconds, or hours.</td><td>How long does one action take?</td></tr>
+              <tr><td>Throughput</td><td>Requests per second, jobs per hour, or bytes per second.</td><td>How many actions finish in a unit of time?</td></tr>
+              <tr><td>Capacity</td><td>Maximum useful throughput under a stated limit.</td><td>How much work can the system accept before a limit breaks?</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Small example</h3>
+        <div class="prose">
+          <p>An assembly line takes 8 hours to build one car. Its latency is 8 hours per car. It builds 120 cars per day. Its throughput is 120 cars per day.</p>
+          <p>Adding workers can increase throughput. It may also increase coordination time. Measure both values.</p>
+        </div>
+        <pre><code>latency   = time for one result
+throughput = results / unit of time</code></pre>
+        <aside class="aws-note" aria-labelledby="aws-02">
+          <h3 id="aws-02">AWS mapping</h3>
+          <p><strong>Use:</strong> CloudWatch metrics for request latency, throughput, errors, and saturation. Use AWS X-Ray when you need a trace across services.</p>
+          <p><strong>Inside AWS:</strong> Put a latency objective on the user path. Measure p50, p95, and p99. Do not use only an average.</p>
+          <p><strong>Watch:</strong> A queue can increase throughput while it increases wait time. Keep synchronous and asynchronous paths separate in the design.</p>
+          <p><a href="https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html" target="_blank" rel="noopener">AWS X-Ray developer guide</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-02">
+          <h3 id="question-02">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a web crawler. How do you increase crawl throughput without making one fetch wait forever?</p>
+          <p><strong>Look for:</strong> Bounded workers, queues, per-host limits, retry policy, and separate fetch latency from total crawl rate.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/web_crawler" target="_blank" rel="noopener">System Design Primer · Web crawler</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>Can a system have high throughput and high latency?</p><p><strong>Answer:</strong> Yes. Batch processing is one example.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://community.cadence.com/cadence_blogs_8/b/fv/posts/understanding-latency-vs-throughput" target="_blank" rel="noopener">Understanding Latency versus Throughput</a>.</li>
+            <li><span class="source-type">Supplemental lecture:</span> <a href="https://www.cs.cornell.edu/courses/cs5150/2022sp/lecture/lec20-slides.pdf" target="_blank" rel="noopener">Cornell lecture slides on latency vs throughput</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-03" data-topic="availability consistency cap partition tolerance cp ap network">
+        <div class="lecture-head">
+          <div class="lecture-index">03</div>
+          <div>
+            <h2>Availability vs Consistency</h2>
+            <p class="objective">Learning objective: Explain the CAP trade-off during a network partition.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>When a distributed system has a network partition, it must choose whether to reject or delay some operations, or return a possibly stale result.</div>
+        <div class="prose">
+          <p><strong>Consistency</strong> means a read returns the most recent accepted write, or returns an error.</p>
+          <p><strong>Availability</strong> means a non-failing node returns a response within a reasonable time.</p>
+          <p><strong>Partition tolerance</strong> means the system continues to operate when nodes cannot communicate.</p>
+          <p>Network partitions can occur. Therefore, the practical choice during a partition is between consistency and availability. This choice depends on the business rule.</p>
+        </div>
+        <figure class="figure">
+          <img src="../images/bgLMI2u.png" alt="Three rows show consistency, availability, and partition tolerance across two nodes. The network link is broken in the partition tolerance row.">
+          <figcaption>Figure from the repository. The three properties describe different guarantees.</figcaption>
+          <p class="figure-note">Text alternative: two nodes share data. A partition breaks their link. The system cannot both return the newest shared value and always return a response.</p>
+        </figure>
+        <div class="flow-wrap" role="img" aria-label="A client sends a request to two data nodes. A network partition breaks their link. The system chooses CP or AP behavior.">
+          <p class="flow-label">Decision during a partition</p>
+          <div class="flow">
+            <div class="flow-step">Client request</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Node A / Node B</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Network link breaks</div>
+            <div class="flow-note">CP: wait or return an error. AP: return a local value and accept possible staleness.</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>CP and AP behavior</caption>
+            <thead><tr><th>Choice</th><th>During a partition</th><th>Use when</th></tr></thead>
+            <tbody>
+              <tr><td>CP</td><td>Wait for coordination or return an error.</td><td>Atomic reads and writes are required.</td></tr>
+              <tr><td>AP</td><td>Return the best local version. Accept later synchronization.</td><td>The system can tolerate stale data for a period.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Use the business rule to choose. A bank balance may require CP behavior. A shopping cart or social reaction may allow AP behavior.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-03">
+          <h3 id="aws-03">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon DynamoDB for a managed distributed key-value store. Use regional tables or global tables only after you state the consistency rule.</p>
+          <p><strong>Inside AWS:</strong> Keep strongly consistent reads and transactional writes in the scope supported by the service. Use asynchronous multi-Region replication when stale reads are acceptable.</p>
+          <p><strong>Watch:</strong> “DynamoDB is AP” is too broad. State the table, Region, read mode, write mode, and failure case.</p>
+          <p><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GlobalTables.html" target="_blank" rel="noopener">DynamoDB global tables</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-03">
+          <h3 id="question-03">Interview question</h3>
+          <p><strong>Prompt:</strong> Design the Twitter timeline and search. During a partition, which result may be stale, and which result must be correct?</p>
+          <p><strong>Look for:</strong> A clear business rule. Feed freshness can tolerate delay. A delete, privacy rule, or account state may need stronger control.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/twitter" target="_blank" rel="noopener">System Design Primer · Twitter timeline and search</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What changes when a network partition occurs?</p><p><strong>Answer:</strong> The system must choose between strict consistency and always returning a response. Partition tolerance is not optional for a distributed system.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://robertgreiner.com/cap-theorem-revisited/" target="_blank" rel="noopener">CAP Theorem: Revisited</a>.</li>
+            <li><span class="source-type">Video source:</span> <a href="https://www.youtube.com/watch?v=k-Yaq8AHlFA&amp;cc_load_policy=1" target="_blank" rel="noopener">L16: The CAP Theorem with English captions</a>. Caption-derived cues: distributed nodes, three guarantees, network partitions, CP, and AP.</li>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/henryr/cap-faq" target="_blank" rel="noopener">CAP FAQ</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-04" data-topic="consistency patterns weak eventual strong replicas synchronization write read after">
+        <div class="lecture-head">
+          <div class="lecture-index">04</div>
+          <div>
+            <h2>Consistency Patterns</h2>
+            <p class="objective">Learning objective: Choose a consistency pattern for a replicated value.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>Replication creates copies. A consistency pattern defines what a reader may see after a write.</div>
+        <div class="prose">
+          <p>When data has several copies, the copies can update at different times. The system must define the allowed view for a reader.</p>
+          <p>Use a read-after-write question. After a client writes a value, what may the next read return?</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A write updates one replica. The update reaches the second replica after a delay. A read may occur before or after the update.">
+          <p class="flow-label">Replicated write and read</p>
+          <div class="flow">
+            <div class="flow-step">Write replica A</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Replicate to B</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Read B</div>
+            <div class="flow-note">The pattern controls the result when the read occurs before replication finishes.</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Three consistency patterns</caption>
+            <thead><tr><th>Pattern</th><th>Read after write</th><th>Typical use</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td>Weak</td><td>The read may see the write or may not see it.</td><td>Real-time audio, video, or multiplayer state.</td><td>Low coordination. Data can be lost or missed.</td></tr>
+              <tr><td>Eventual</td><td>The read will see the write after propagation completes.</td><td>DNS, email, search indexes.</td><td>Low write coordination. Reads can be stale for a period.</td></tr>
+              <tr><td>Strong</td><td>The read sees the accepted write.</td><td>Transactions, files, and relational databases.</td><td>More coordination, latency, or reduced availability.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Eventual consistency requires a condition. If writes stop and replication continues, copies converge to the same value. If new writes keep arriving, convergence may not occur.</p>
+          <p>Do not choose a pattern by habit. State the user-visible error that stale data would cause.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-04">
+          <h3 id="aws-04">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon Aurora or Amazon RDS when relational transactions matter. Use DynamoDB when access patterns fit partition-key reads and writes.</p>
+          <p><strong>Inside AWS:</strong> Use a writer endpoint for writes and reader endpoints or replicas for read scale. Document replica lag. Select a DynamoDB read mode that matches the required guarantee.</p>
+          <p><strong>Watch:</strong> A read replica is not a strong-consistency guarantee. The application must know what stale data means.</p>
+          <p><a href="https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html" target="_blank" rel="noopener">DynamoDB read consistency</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-04">
+          <h3 id="question-04">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a key-value store for a search engine. How do you keep replicas useful when a read reaches a replica that is behind?</p>
+          <p><strong>Look for:</strong> Read and write paths, replication delay, failure behavior, repair, and a statement of the allowed stale window.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/query_cache" target="_blank" rel="noopener">System Design Primer · Key-value store</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What does eventual consistency promise?</p><p><strong>Answer:</strong> A read will see the write after the data has propagated, if updates stop and propagation continues.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="http://snarfed.org/transactions_across_datacenters_io.html" target="_blank" rel="noopener">Transactions Across Datacenters</a>.</li>
+            <li><span class="source-type">Video source:</span> <a href="https://www.youtube.com/watch?v=srOgpXECblk&amp;cc_load_policy=1" target="_blank" rel="noopener">Google I/O 2009 — Transactions Across Datacenters with captions</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://www.allthingsdistributed.com/2008/12/eventually_consistent.html" target="_blank" rel="noopener">Eventually Consistent — Revisited</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-05" data-topic="availability patterns failover replication uptime nines parallel sequence redundancy">
+        <div class="lecture-head">
+          <div class="lecture-index">05</div>
+          <div>
+            <h2>Availability Patterns</h2>
+            <p class="objective">Learning objective: Explain how failover, replication, and redundancy change service availability.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>High availability uses more than one path or copy. The extra path helps only when it can take over and the service can use it.</div>
+        <div class="prose">
+          <p><strong>Failover</strong> moves service from a failed node to a standby node. In active-passive mode, one node handles traffic. In active-active mode, both nodes handle traffic.</p>
+          <p><strong>Replication</strong> keeps more than one copy of data or service state. The copy can be synchronous or asynchronous. The choice affects data loss, latency, and recovery.</p>
+          <p>Availability is often written as a percentage. Three nines means 99.9% availability. Four nines means 99.99% availability.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Availability in numbers</caption>
+            <thead><tr><th>Target</th><th>Allowed downtime per year</th><th>Allowed downtime per day</th></tr></thead>
+            <tbody>
+              <tr><td>99.9%</td><td>About 8 hours 46 minutes.</td><td>About 1 minute 26 seconds.</td></tr>
+              <tr><td>99.99%</td><td>About 52 minutes 36 seconds.</td><td>About 8.6 seconds.</td></tr>
+              <tr><td>99.999%</td><td>About 5 minutes 16 seconds.</td><td>About 0.87 seconds.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <pre><code>sequence:  A_total = A_foo × A_bar
+parallel:  A_total = 1 - (1 - A_foo) × (1 - A_bar)</code></pre>
+        <div class="prose">
+          <p>For two 99.9% components in sequence, total availability is about 99.8%. Both components must work.</p>
+          <p>For two 99.9% components in parallel, total availability is about 99.9999%. At least one component must work.</p>
+          <p>These formulas describe independent component availability. They do not prove that the failover process is correct. Test health checks, promotion, state recovery, and client retry behavior.</p>
+        </div>
+        <div class="study-check">
+          <div class="check-item"><strong>Failover</strong>What moves when a node fails?</div>
+          <div class="check-item"><strong>Replication</strong>Which state can be lost?</div>
+          <div class="check-item"><strong>Measure</strong>What availability target is required?</div>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-05">
+          <h3 id="aws-05">AWS mapping</h3>
+          <p><strong>Use:</strong> Multi-AZ deployment for compute and data. Use Elastic Load Balancing health checks and Route 53 health-based routing when traffic must move.</p>
+          <p><strong>Inside AWS:</strong> Define recovery time objective and recovery point objective. Test failover, data promotion, DNS behavior, and client retries.</p>
+          <p><strong>Watch:</strong> More copies can increase write latency and split-brain risk. Redundancy without a tested recovery path is not availability.</p>
+          <p><a href="https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html" target="_blank" rel="noopener">AWS Reliability Pillar</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-05">
+          <h3 id="question-05">Interview question</h3>
+          <p><strong>Prompt:</strong> Design Pastebin.com or Bit.ly. The service must remain available when one compute node or one Availability Zone fails.</p>
+          <p><strong>Look for:</strong> Redundant entry points, stateless workers, durable storage, health checks, and a recovery plan.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/pastebin" target="_blank" rel="noopener">System Design Primer · Pastebin / Bit.ly</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>Why does adding a standby not automatically give high availability?</p><p><strong>Answer:</strong> The system also needs detection, promotion, state recovery, and a valid client path to the new node.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository content:</span> <a href="https://github.com/donnemartin/system-design-primer/blob/master/README.md#availability-patterns" target="_blank" rel="noopener">Availability Patterns in the System Design Primer</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://sre.google/sre-book/availability-table/" target="_blank" rel="noopener">Google SRE availability table</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://aws.amazon.com/builders-library/static-stability-using-availability-zones/" target="_blank" rel="noopener">AWS: Static stability using Availability Zones</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <p class="part-break">Part II · Request path and services</p>
+      <article class="lecture" id="lecture-06" data-topic="dns domain name system resolver root tld authoritative ttl records">
+        <div class="lecture-head">
+          <div class="lecture-index">06</div>
+          <div>
+            <h2>Domain Name System</h2>
+            <p class="objective">Learning objective: Trace a domain name to an IP address and explain the role of caching.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>DNS maps a name such as <code>www.example.com</code> to an address that a client can use.</div>
+        <div class="prose">
+          <p>A browser asks a recursive resolver for an address. If the resolver has no cached answer, it asks the root name server, the top-level domain server, and the authoritative name server.</p>
+          <p>The resolver caches the answer for the record's time to live, or TTL. A longer TTL reduces lookup work but keeps old data longer.</p>
+        </div>
+        <figure class="figure">
+          <img src="../images/IOyLj4i.jpg" alt="DNS diagram showing a client, an ISP DNS server, a root DNS server, and a web server.">
+          <figcaption>Figure from the repository. The resolver can answer from its cache or ask upstream name servers.</figcaption>
+          <p class="figure-note">Text alternative: the client asks a resolver. The resolver finds the authoritative address. The client then sends the web request to the returned address.</p>
+        </figure>
+        <div class="flow-wrap" role="img" aria-label="A DNS lookup goes from the browser to a resolver, then to root, TLD, and authoritative name servers, and returns an address.">
+          <p class="flow-label">Uncached lookup</p>
+          <div class="flow">
+            <div class="flow-step">Browser</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Recursive resolver</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Root / TLD / authoritative</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">IP address</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Common DNS records</caption>
+            <thead><tr><th>Record</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td>Maps a name to an IPv4 address.</td></tr>
+              <tr><td>AAAA</td><td>Maps a name to an IPv6 address.</td></tr>
+              <tr><td>CNAME</td><td>Maps a name to another name.</td></tr>
+              <tr><td>MX</td><td>Identifies mail servers for a domain.</td></tr>
+              <tr><td>NS</td><td>Identifies the authoritative name servers.</td></tr>
+              <tr><td>TTL</td><td>States how long a cached record may be used.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>DNS can also return different addresses for traffic steering. A service can use weighted, latency-based, or geographic routing. The routing policy does not remove the need for health checks and failure planning.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-06">
+          <h3 id="aws-06">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon Route 53 for hosted zones, DNS records, health checks, and routing policies.</p>
+          <p><strong>Inside AWS:</strong> Point a domain to CloudFront, an Application Load Balancer, or an API Gateway API. Select a routing policy. Set TTL with the failure and change window in mind.</p>
+          <p><strong>Watch:</strong> DNS changes are cached. A low TTL can increase resolver work. A high TTL can slow failover.</p>
+          <p><a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html" target="_blank" rel="noopener">Amazon Route 53 Developer Guide</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-06">
+          <h3 id="question-06">Interview question</h3>
+          <p><strong>Prompt:</strong> Design Pastebin.com or Bit.ly. How does a short URL reach the correct service when the service has many regions?</p>
+          <p><strong>Look for:</strong> DNS resolution, TTL, traffic steering, a stable public name, and what happens when one target fails.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/pastebin" target="_blank" rel="noopener">System Design Primer · Pastebin / Bit.ly</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What is the main benefit and main cost of DNS caching?</p><p><strong>Answer:</strong> Caching reduces lookup delay and work. It can return an old address until the TTL expires.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://datatracker.ietf.org/doc/html/rfc1034" target="_blank" rel="noopener">RFC 1034 — Domain Names: Concepts and Facilities</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://www.cloudflare.com/learning/dns/what-is-a-dns-server/" target="_blank" rel="noopener">Cloudflare: What is a DNS server?</a>.</li>
+            <li><span class="source-type">Repository source:</span> <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-latency.html" target="_blank" rel="noopener">Amazon Route 53 latency-based routing</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-07" data-topic="cdn content delivery network edge cache origin push pull ttl static dynamic">
+        <div class="lecture-head">
+          <div class="lecture-index">07</div>
+          <div>
+            <h2>Content Delivery Network</h2>
+            <p class="objective">Learning objective: Explain why an edge cache reduces origin work and user distance.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>A CDN stores copies at edge locations. A user can receive a cached object from an edge location near the user.</div>
+        <div class="prose">
+          <p>A cache hit returns an object without asking the origin. A cache miss asks the origin and can store the result for later requests.</p>
+          <p>Static assets such as images, CSS, JavaScript, and video are common CDN content. Dynamic content needs a rule that makes caching safe.</p>
+        </div>
+        <figure class="figure">
+          <img src="../images/h9TAuGI.jpg" alt="Map diagram showing a central origin connected to edge servers around the world, which serve nearby clients.">
+          <figcaption>Figure from the repository. Edge locations reduce the distance between the user and the cached object.</figcaption>
+          <p class="figure-note">Text alternative: one origin sends content to several edge locations. Each edge location serves nearby clients.</p>
+        </figure>
+        <div class="flow-wrap" role="img" aria-label="A user asks an edge location for an object. A cache hit returns the object. A cache miss asks the origin and stores the response.">
+          <p class="flow-label">CDN request path</p>
+          <div class="flow">
+            <div class="flow-step">User</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Edge cache</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Hit: return</div>
+            <div class="flow-note">Miss: fetch from origin, return to user, and store according to the cache policy.</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Push and pull CDN patterns</caption>
+            <thead><tr><th>Pattern</th><th>When content reaches the edge</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td>Push</td><td>The origin sends new or changed content to the CDN.</td><td>More control and fewer first-request misses. More storage and upload work.</td></tr>
+              <tr><td>Pull</td><td>The CDN fetches content after the first request.</td><td>Less upload work. The first request can be slower and stale data needs a TTL or purge.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Cache policy is part of correctness. Set the cache key, TTL, revalidation rule, and purge rule. Do not cache user-specific content under a shared key.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-07">
+          <h3 id="aws-07">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon CloudFront in front of an S3 bucket, an Application Load Balancer, or a custom origin.</p>
+          <p><strong>Inside AWS:</strong> Define a cache policy and origin request policy. Use versioned asset names or invalidation when content changes. Keep private content out of shared cache keys.</p>
+          <p><strong>Watch:</strong> A CDN reduces origin traffic. It does not remove origin capacity, invalidation, or authorization work.</p>
+          <p><a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html" target="_blank" rel="noopener">Amazon CloudFront Developer Guide</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-07">
+          <h3 id="question-07">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a file-sync service like Dropbox. How do you deliver popular files near users and keep changed files correct?</p>
+          <p><strong>Look for:</strong> Object storage, metadata, edge caching, cache keys, versioning, invalidation, and access control.</p>
+          <p class="question-source">Public prompt listed by the <a href="https://github.com/donnemartin/system-design-primer#additional-system-design-interview-questions" target="_blank" rel="noopener">System Design Primer</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What happens on a cache miss?</p><p><strong>Answer:</strong> The edge asks the origin, returns the response, and may store the object for later requests.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://figshare.com/articles/Globally_distributed_content_delivery/6605972" target="_blank" rel="noopener">Globally distributed content delivery</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://developers.cloudflare.com/cache/" target="_blank" rel="noopener">Cloudflare Cache and CDN documentation</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://developers.cloudflare.com/cache/concepts/retention-vs-freshness/" target="_blank" rel="noopener">Cloudflare: Retention vs Freshness (TTL)</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-08" data-topic="load balancer l4 l7 health check horizontal scaling active active passive routing">
+        <div class="lecture-head">
+          <div class="lecture-index">08</div>
+          <div>
+            <h2>Load Balancer</h2>
+            <p class="objective">Learning objective: Explain how a load balancer selects a healthy target and supports scale-out.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>A load balancer receives traffic, chooses a target, and avoids targets that fail health checks.</div>
+        <div class="prose">
+          <p>A load balancer can spread requests across application servers. It can remove an unhealthy server from the pool. It can also terminate TLS and keep a stable public address.</p>
+          <p>Horizontal scaling adds more workers. Workers should be stateless when possible. Store sessions and durable data in a shared data system.</p>
+        </div>
+        <figure class="figure">
+          <img src="../images/h81n9iK.png" alt="Load balancer diagram showing a client, a dispatcher, and a pool of workers. The dispatcher selects a worker and returns its response.">
+          <figcaption>Figure from the repository. The dispatcher selects a worker and forwards the response.</figcaption>
+          <p class="figure-note">Text alternative: a client sends a request to a dispatcher. The dispatcher selects a worker, waits for the result, and returns it.</p>
+        </figure>
+        <div class="flow-wrap" role="img" aria-label="A client sends a request to a load balancer. The load balancer checks target health, chooses a worker, and returns the worker response.">
+          <p class="flow-label">Request routing</p>
+          <div class="flow">
+            <div class="flow-step">Client</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Load balancer</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Healthy worker</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Response</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Layer 4 and Layer 7</caption>
+            <thead><tr><th>Layer</th><th>Decision uses</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td>Layer 4</td><td>IP addresses, ports, and transport information.</td><td>Less request inspection. Lower processing cost.</td></tr>
+              <tr><td>Layer 7</td><td>HTTP headers, paths, cookies, and message content.</td><td>More routing control. More processing and policy.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Use round robin when targets are similar. Use least loaded when target capacity or current work differs. Use session persistence only when the application cannot keep session state in a shared store.</p>
+          <p>A single load balancer can become a single point of failure. Use more than one load balancer and define how clients reach the healthy one.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-08">
+          <h3 id="aws-08">AWS mapping</h3>
+          <p><strong>Use:</strong> Elastic Load Balancing. Choose an Application Load Balancer for HTTP routing, a Network Load Balancer for high-performance TCP or UDP, or a Gateway Load Balancer for network appliances.</p>
+          <p><strong>Inside AWS:</strong> Put targets in multiple Availability Zones. Use target groups, health checks, listener rules, and Auto Scaling. Keep application sessions external to targets.</p>
+          <p><strong>Watch:</strong> Health checks must test useful service health. A process that answers a port can still be unable to serve real requests.</p>
+          <p><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html" target="_blank" rel="noopener">AWS Elastic Load Balancing</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-08">
+          <h3 id="question-08">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a system that scales to millions of users on AWS. Where is the load balancer, and how does it stop sending traffic to a failed target?</p>
+          <p><strong>Look for:</strong> Layer choice, target groups, health checks, zone failure, capacity changes, and retry behavior.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/scaling_aws" target="_blank" rel="noopener">System Design Primer · Scaling on AWS</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>Why must a horizontally scaled worker be stateless when possible?</p><p><strong>Answer:</strong> Any healthy worker can serve the next request. User state does not bind the user to one worker.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html" target="_blank" rel="noopener">AWS: What is Elastic Load Balancing?</a>.</li>
+            <li><span class="source-type">Repository source:</span> <a href="https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/" target="_blank" rel="noopener">NGINX architecture</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/how-elastic-load-balancing-works.html" target="_blank" rel="noopener">AWS: How Elastic Load Balancing works</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-09" data-topic="reverse proxy web server nginx load balancer tls compression caching static content">
+        <div class="lecture-head">
+          <div class="lecture-index">09</div>
+          <div>
+            <h2>Reverse Proxy</h2>
+            <p class="objective">Learning objective: Explain how a reverse proxy presents one public interface for internal services.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>A reverse proxy receives a public request and forwards it to an internal server. The client does not need to know the internal server address.</div>
+        <div class="prose">
+          <p>A reverse proxy can work with one backend server. A load balancer usually distributes work across several equivalent targets. One product can do both jobs.</p>
+          <p>Common proxy work includes TLS termination, compression, caching, static file serving, connection limits, and request filtering.</p>
+        </div>
+        <figure class="figure">
+          <img src="../images/n41Azff.png" alt="Reverse proxy diagram showing the Internet reaching a proxy, which forwards requests to a web server inside an internal network.">
+          <figcaption>Figure from the repository. The proxy is the public boundary for the internal server.</figcaption>
+          <p class="figure-note">Text alternative: the client sees the proxy. The proxy forwards the request to a private web server and returns the response.</p>
+        </figure>
+        <div class="flow-wrap" role="img" aria-label="A client sends a request to a reverse proxy. The proxy applies common edge work, forwards the request to an internal service, and returns the response.">
+          <p class="flow-label">Proxy request path</p>
+          <div class="flow">
+            <div class="flow-step">Client</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Reverse proxy</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Internal service</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Response</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Reverse proxy and load balancer</caption>
+            <thead><tr><th>Question</th><th>Reverse proxy</th><th>Load balancer</th></tr></thead>
+            <tbody>
+              <tr><td>Can it work with one backend?</td><td>Yes.</td><td>Usually the useful case has more than one target.</td></tr>
+              <tr><td>Primary role</td><td>Hide and protect internal services. Apply edge work.</td><td>Distribute requests across targets.</td></tr>
+              <tr><td>Can one system do both?</td><td colspan="2">Yes. NGINX and HAProxy support both roles.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>The proxy becomes a dependency. A single proxy is a single point of failure. Use more than one proxy when the availability target requires it.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-09">
+          <h3 id="aws-09">AWS mapping</h3>
+          <p><strong>Use:</strong> CloudFront for edge work, an Application Load Balancer for HTTP routing, or API Gateway for a managed public API boundary. Run NGINX on ECS or EC2 when its policy is required.</p>
+          <p><strong>Inside AWS:</strong> Terminate TLS at the selected boundary. Forward only the headers and paths that the internal service needs. Keep the boundary redundant.</p>
+          <p><strong>Watch:</strong> Each proxy adds a hop. Measure connection reuse, header limits, buffering, timeout values, and body size limits.</p>
+          <p><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html" target="_blank" rel="noopener">AWS Application Load Balancer</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-09">
+          <h3 id="question-09">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a search engine. Where would you put a reverse proxy, and what work should it do before the search service?</p>
+          <p><strong>Look for:</strong> TLS, request limits, routing, caching of safe results, timeouts, and a clear boundary between edge and search logic.</p>
+          <p class="question-source">Public prompt listed by the <a href="https://github.com/donnemartin/system-design-primer#additional-system-design-interview-questions" target="_blank" rel="noopener">System Design Primer</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What does the client know about the internal service?</p><p><strong>Answer:</strong> The client only needs the public proxy interface. The proxy owns the internal routing detail.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://www.nginx.com/resources/glossary/reverse-proxy-vs-load-balancer/" target="_blank" rel="noopener">NGINX: Reverse proxy vs load balancer</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html" target="_blank" rel="noopener">NGINX proxy module documentation</a>.</li>
+            <li><span class="source-type">Repository source:</span> <a href="http://www.haproxy.org/download/1.2/doc/architecture.txt" target="_blank" rel="noopener">HAProxy architecture guide</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-10" data-topic="application layer platform layer web servers microservices service discovery consul">
+        <div class="lecture-head">
+          <div class="lecture-index">10</div>
+          <div>
+            <h2>Application Layer</h2>
+            <p class="objective">Learning objective: Separate public web handling from application work and service discovery.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>Separate layers when they have different scaling, release, or failure needs. The application layer runs business logic and calls data services.</div>
+        <div class="prose">
+          <p>The web layer can handle connections and static content. The application layer can handle business rules and API requests. Each layer can scale on its own.</p>
+          <p>A microservice is a small service that can be deployed independently and owns a business capability. The network call adds latency and failure modes. Use a service boundary only when the boundary has value.</p>
+          <p>Service discovery maps a service name to healthy service instances. A service registry stores addresses and health state. A resolver or proxy returns a usable target.</p>
+        </div>
+        <figure class="figure">
+          <img src="../images/yB5SYwm.png" alt="Application layer diagram showing a request entering a load balancer, then web servers, platform servers, and databases.">
+          <figcaption>Figure from the repository. Web servers and platform servers can scale as separate pools.</figcaption>
+          <p class="figure-note">Text alternative: the load balancer selects a web server. The web server calls an application server. The application server calls a database.</p>
+        </figure>
+        <div class="flow-wrap" role="img" aria-label="A request goes through a load balancer to a web layer, then to an application service, then to a data store.">
+          <p class="flow-label">Layered request path</p>
+          <div class="flow">
+            <div class="flow-step">Request</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Web layer</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Application service</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Data store</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>What the application layer changes</caption>
+            <thead><tr><th>Benefit</th><th>New cost</th><th>Control</th></tr></thead>
+            <tbody>
+              <tr><td>Scale a business function without scaling every web server.</td><td>More network calls and more deployment units.</td><td>Set service boundaries around clear capabilities.</td></tr>
+              <tr><td>Deploy a service independently.</td><td>Version and test an explicit remote interface.</td><td>Use backward-compatible contracts.</td></tr>
+              <tr><td>Remove unhealthy instances from service traffic.</td><td>Operate a service registry and health checks.</td><td>Use a highly available discovery path.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="prose">
+          <p>Start with a clear business capability. Do not split a system only because a smaller service sounds modern. A modular monolith can keep local calls and still preserve useful boundaries.</p>
+          <p>When services move, fixed IP addresses become fragile. Service discovery lets a caller use a service identity and find a healthy instance at request time.</p>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-10">
+          <h3 id="aws-10">AWS mapping</h3>
+          <p><strong>Use:</strong> Amazon ECS or Amazon EKS for long-running services, AWS Lambda for event-driven functions, and AWS Cloud Map for service discovery.</p>
+          <p><strong>Inside AWS:</strong> Give each service a private endpoint or service-discovery name. Use IAM roles, health checks, timeouts, and retries. Keep a boundary only when it owns a useful capability.</p>
+          <p><strong>Watch:</strong> Service discovery finds an instance. It does not make a bad dependency fast or reliable.</p>
+          <p><a href="https://docs.aws.amazon.com/cloud-map/latest/dg/what-is-cloud-map.html" target="_blank" rel="noopener">AWS Cloud Map</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-10">
+          <h3 id="question-10">Interview question</h3>
+          <p><strong>Prompt:</strong> Design the data structures for a social network. Which responsibilities stay in one service, and which can move to separate services?</p>
+          <p><strong>Look for:</strong> User, graph, feed, and search boundaries; service calls; data ownership; and failure behavior.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/social_graph" target="_blank" rel="noopener">System Design Primer · Social graph</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What does service discovery provide?</p><p><strong>Answer:</strong> It maps a service identity to healthy instances and removes hardcoded addresses from callers.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="http://lethain.com/introduction-to-architecting-systems-for-scale/#platform_layer" target="_blank" rel="noopener">Intro to Architecting Systems for Scale</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://martinfowler.com/articles/microservices.html" target="_blank" rel="noopener">Martin Fowler: Microservices</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://developer.hashicorp.com/consul/docs/discover" target="_blank" rel="noopener">HashiCorp Consul: Discover services</a>.</li>
+            <li><span class="source-type">Supplemental source:</span> <a href="https://docs.aws.amazon.com/en_en/prescriptive-guidance/latest/cloud-design-patterns/introduction.html" target="_blank" rel="noopener">AWS Prescriptive Guidance: Cloud design patterns</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-19" data-topic="interview method requirements assumptions design bottleneck tradeoff communication system design interview">
+        <div class="lecture-head">
+          <div class="lecture-index">19</div>
+          <div>
+            <h2>Interview Method</h2>
+            <p class="objective">Learning objective: Lead an open design discussion from requirements to one justified architecture.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>A good interview design is a sequence of stated assumptions, simple components, measured constraints, and explicit trade-offs.</div>
+        <div class="prose">
+          <p>First, define the users and the most important actions. Ask about read and write volume, data size, latency, availability, geography, privacy, and retention.</p>
+          <p>Second, draw the high-level request path. Third, estimate the scale. Fourth, choose storage and failure behavior. Fifth, deep dive into the component that limits the requirement.</p>
+          <p>End by naming the main bottleneck, the next improvement, and the trade-off. A design is easier to review when another engineer can test its assumptions.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="An interview moves from requirements to estimates, high-level design, deep dive, trade-offs, and a final summary.">
+          <p class="flow-label">Interview sequence</p>
+          <div class="flow">
+            <div class="flow-step">Requirements</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Estimate</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">High-level path</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Deep dive + trade-off</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Questions to ask</caption>
+            <thead><tr><th>Area</th><th>Question</th></tr></thead>
+            <tbody>
+              <tr><td>Users</td><td>Who calls the system, and what is the main action?</td></tr>
+              <tr><td>Scale</td><td>How many users, requests, bytes, and peak events?</td></tr>
+              <tr><td>Correctness</td><td>What may be stale, duplicated, delayed, or lost?</td></tr>
+              <tr><td>Failure</td><td>What should happen when a dependency or zone fails?</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-19">
+          <h3 id="aws-19">AWS mapping</h3>
+          <p><strong>Use:</strong> The AWS Well-Architected Framework as a review checklist after the high-level design.</p>
+          <p><strong>Inside AWS:</strong> Review operational excellence, security, reliability, performance efficiency, cost optimization, and sustainability. Tie each concern to a component and a metric.</p>
+          <p><strong>Watch:</strong> Naming many AWS services is not an architecture. Explain the request path and the reason for each service.</p>
+          <p><a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html" target="_blank" rel="noopener">AWS Well-Architected Framework</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-19">
+          <h3 id="question-19">Interview question</h3>
+          <p><strong>Prompt:</strong> Design the Twitter timeline and search. Lead the discussion: clarify requirements, estimate scale, draw the path, and choose one deep dive.</p>
+          <p><strong>Look for:</strong> A clear scope, feed read/write strategy, search indexing, fan-out trade-off, cache behavior, and failure plan.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/twitter" target="_blank" rel="noopener">System Design Primer · Twitter timeline and search</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What should you state before naming a database?</p><p><strong>Answer:</strong> The user action, data shape, access pattern, scale, correctness rule, and failure behavior.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#how-to-approach-a-system-design-interview-question" target="_blank" rel="noopener">How to approach a system design interview question</a>.</li>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/twitter" target="_blank" rel="noopener">Design the Twitter timeline and search</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html" target="_blank" rel="noopener">AWS Well-Architected Framework</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="lecture" id="lecture-20" data-topic="capstone architecture aws millions users route53 cloudfront alb ecs rds dynamodb s3 observability">
+        <div class="lecture-head">
+          <div class="lecture-index">20</div>
+          <div>
+            <h2>Capstone: A System That Scales</h2>
+            <p class="objective">Learning objective: Combine the book's patterns into one design and explain why each component exists.</p>
+          </div>
+        </div>
+        <div class="core-idea"><strong>Core idea</strong>Scale the request path in stages. Keep durable state explicit. Add a component only when a stated limit requires it.</div>
+        <div class="prose">
+          <p>Start with a client and a public name. Route the name to an edge or load balancer. Send the request to stateless application workers. Use a cache for repeated reads. Use a database for durable state. Put slow work on a queue.</p>
+          <p>For growth, add replicas or shards after measuring the limit. For failure, use more than one Availability Zone and define health checks, recovery, and data loss. For security, authenticate the caller and authorize each action.</p>
+          <p>This is a starting architecture. It is not a promise of capacity. The numbers, workload, and correctness rules decide the final design.</p>
+        </div>
+        <div class="flow-wrap" role="img" aria-label="A client reaches Route 53 and CloudFront or an Application Load Balancer. Traffic goes to stateless ECS workers. Workers read ElastiCache and Aurora or DynamoDB, and send slow work to SQS. CloudWatch measures the path.">
+          <p class="flow-label">One AWS request path</p>
+          <div class="flow">
+            <div class="flow-step">Client</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Route 53 + edge</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">ALB + ECS</div><div class="flow-arrow" aria-hidden="true">→</div>
+            <div class="flow-step">Cache + database</div>
+            <div class="flow-note">Slow work leaves the request path through SQS. CloudWatch observes every important limit.</div>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>Capstone component map</caption>
+            <thead><tr><th>Need</th><th>Starting component</th><th>Reason to change</th></tr></thead>
+            <tbody>
+              <tr><td>Public name and traffic</td><td>Route 53, CloudFront, and ALB</td><td>Global latency, routing, or target capacity becomes a limit.</td></tr>
+              <tr><td>Business logic</td><td>ECS service or Lambda function</td><td>Request rate, execution time, or deployment boundary changes.</td></tr>
+              <tr><td>Repeated reads</td><td>ElastiCache</td><td>Measured database load or latency requires a cache.</td></tr>
+              <tr><td>Durable data</td><td>Aurora, RDS, DynamoDB, or S3</td><td>Query shape, transaction rule, size, or write scale changes.</td></tr>
+              <tr><td>Slow work</td><td>SQS and worker service</td><td>Work can be delayed and must be retried safely.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <aside class="aws-note" aria-labelledby="aws-20">
+          <h3 id="aws-20">AWS mapping</h3>
+          <p><strong>Use:</strong> Route 53, CloudFront, Elastic Load Balancing, ECS or EKS, ElastiCache, Aurora or DynamoDB, S3, SQS, IAM, KMS, WAF, and CloudWatch as the requirement calls for them.</p>
+          <p><strong>Inside AWS:</strong> Deploy across Availability Zones. Use private subnets for internal services and data. Define alarms for latency, errors, saturation, queue age, replica lag, and failed health checks.</p>
+          <p><strong>Watch:</strong> Review cost, reliability, security, performance, operations, and sustainability together. A working diagram still needs load tests and failure tests.</p>
+          <p><a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">AWS Well-Architected pillars</a></p>
+        </aside>
+        <aside class="interview-question" aria-labelledby="question-20">
+          <h3 id="question-20">Interview question</h3>
+          <p><strong>Prompt:</strong> Design a system that scales to millions of users on AWS. Give the request path, data model, cache rule, asynchronous path, failure plan, security controls, and three estimates.</p>
+          <p><strong>Look for:</strong> A simple first design, explicit bottlenecks, a reason for each AWS service, and a clear trade-off when scale or correctness changes.</p>
+          <p class="question-source">Public interview exercise: <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/scaling_aws" target="_blank" rel="noopener">System Design Primer · Scaling on AWS</a>.</p>
+        </aside>
+        <details class="recall">
+          <summary>Recall check</summary>
+          <div class="recall-body"><p>What makes this a design and not a list of services?</p><p><strong>Answer:</strong> Each component answers a stated requirement, has a request path, and has a failure and trade-off statement.</p></div>
+        </details>
+        <div class="sources">
+          <h3>Sources</h3>
+          <ol>
+            <li><span class="source-type">Interview source:</span> <a href="https://github.com/donnemartin/system-design-primer/tree/master/solutions/system_design/scaling_aws" target="_blank" rel="noopener">Design a system that scales to millions of users on AWS</a>.</li>
+            <li><span class="source-type">Repository source:</span> <a href="https://github.com/donnemartin/system-design-primer#system-design-interview-questions-with-solutions" target="_blank" rel="noopener">System Design Primer interview questions with solutions</a>.</li>
+            <li><span class="source-type">AWS source:</span> <a href="https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html" target="_blank" rel="noopener">AWS Well-Architected pillars</a>.</li>
+          </ol>
+        </div>
+      </article>
+
+      <section class="end-note" aria-labelledby="continue-title">
+        <h2 id="continue-title">End of the first field book.</h2>
+        <p>Return to any lecture. Answer its interview question without looking. Then draw the capstone again with one different correctness or scale requirement.</p>
+        <p><a href="../README.md">Return to the full System Design Primer</a> for exercises, object-oriented design, databases, caches, communication, and security.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById("search-form");
+      const input = document.getElementById("search-input");
+      const clear = document.getElementById("clear-search");
+      const noResults = document.getElementById("no-results");
+      const main = document.querySelector("main");
+      const lectures = Array.from(document.querySelectorAll(".lecture"));
+      const links = Array.from(document.querySelectorAll(".chapter-list a"));
+
+      const partTitles = {
+        "lecture-01": "Part I · Trade-offs and failure",
+        "lecture-06": "Part II · Request path and services",
+        "lecture-11": "Part III · Data, cache, and work",
+        "lecture-14": "Part IV · Communication and trust",
+        "lecture-18": "Part V · Estimation and interview practice"
+      };
+      document.querySelectorAll(".part-break").forEach(function (part) { part.remove(); });
+      const endNote = document.querySelector(".end-note");
+      lectures.sort(function (a, b) { return a.id.localeCompare(b.id); });
+      lectures.forEach(function (lecture) {
+        if (partTitles[lecture.id]) {
+          const part = document.createElement("p");
+          part.className = "part-break";
+          part.textContent = partTitles[lecture.id];
+          main.insertBefore(part, endNote);
+        }
+        main.insertBefore(lecture, endNote);
+      });
+
+      function applySearch() {
+        const term = input.value.trim().toLowerCase();
+        let visible = 0;
+        lectures.forEach(function (lecture) {
+          const match = !term || lecture.textContent.toLowerCase().includes(term) || (lecture.dataset.topic || "").includes(term);
+          lecture.classList.toggle("hidden-by-search", !match);
+          if (match) visible += 1;
+        });
+        noResults.classList.toggle("is-visible", visible === 0);
+      }
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        applySearch();
+      });
+      input.addEventListener("input", applySearch);
+      clear.addEventListener("click", function () {
+        input.value = "";
+        applySearch();
+        input.focus();
+      });
+      document.getElementById("print-notes").addEventListener("click", function () {
+        window.print();
+      });
+
+      const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          links.forEach(function (link) {
+            link.setAttribute("aria-current", String(link.getAttribute("href") === "#" + entry.target.id));
+          });
+        });
+      }, { rootMargin: "-18% 0px -70% 0px", threshold: 0 });
+      lectures.forEach(function (lecture) { observer.observe(lecture); });
+    }());
+  </script>
+</body>
+</html>
