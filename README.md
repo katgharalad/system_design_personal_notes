@@ -2,13 +2,22 @@
 
 **Help [translate](TRANSLATIONS.md) this guide!**
 
-# The System Design Primer
+# System Design Personal Notes
 
-Read all 20 topics as a [simplified HTML lecture book](book/index.html).
+A public study resource built from my personal system design and AWS compute notes.
 
-The site is ready for Vercel. Import this repository as a static project. Keep the project root at the repository root. No build command or environment variables are required. The root page lets readers choose the System Design Primer book or the AWS Notes module index.
+- **[Open the study site](https://system-design-personal-notes.vercel.app/)** — choose the system design book or AWS notes.
+- **[Read the 20-lecture system design book](book/index.html)** — an ordered path with worked examples, AWS mappings, and interview practice.
+- **[Study AWS Compute](aws/compute/index.html)** — lessons, exercises, interview scenarios, and visual explanations.
+- **[Check content status and gaps](aws/compute-app/COVERAGE.md)** — the AWS Compute curriculum remains in progress; units marked Draft are not presented as complete.
 
-AWS Compute lives at [aws/compute/](aws/compute/index.html). Its React/TypeScript source is in `aws/compute-app/`; generated static files in `aws/compute/` are part of the deployable site. To edit it, run `npm ci` and `npm run build` in `aws/compute-app/`. Unit 1 is a Draft textbook section with five expanded chapters and 50 sourced interview questions. Unit 3 now has a Draft Lambda lifecycle lesson with a Manim animation, four prediction checkpoints, a separate React concurrency lab, and four linked interview questions. The guided mock interview, decision lab, and two-AZ architecture exercise remain available. See `aws/compute-app/COVERAGE.md` for content QA and known gaps. Other units are listed as planned inside the app. Source links and AWS guide update dates are in `aws/compute-app/src/sources.json`; regenerate that file with `npm run sources` from `aws/compute-app/`. Manim source, storyboards, render commands, and cache details are in [animations/README.md](animations/README.md).
+This is an independent learning project. It is not an official AWS resource, and the original practice questions are not claimed to be reports from real company interviews. The AWS Compute notes are being developed in public and still have known content gaps.
+
+## Attribution and license
+
+This repository builds on the [System Design Primer](https://github.com/donnemartin/system-design-primer) by Donne Martin. Existing source content remains credited under the repository’s [Creative Commons Attribution 4.0 license](LICENSE.txt). New notes and learning tools are part of this personal study project. Please retain attribution when sharing or adapting material.
+
+The Vercel deployment serves the static site from the repository root. To edit the React AWS Compute module, run `npm ci` and `npm run build` in `aws/compute-app/`. See [animations/README.md](animations/README.md) for Manim sources and reproducible rendering steps.
 
 Local preview: run `python3 -m http.server 4173`, then open `http://127.0.0.1:4173/`.
 
