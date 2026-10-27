@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:02.820 --> 00:00:04.331
+First request arrives. In this example, Lambda has no ready environment.
+
+2
+00:00:04.331 --> 00:00:10.474
+Lambda creates environment A. Runtime and code outside the handler initialize before Invoke.
+
+3
+00:00:10.474 --> 00:00:16.214
+After Init, the handler processes request one. Init adds latency to this cold invocation.
+
+4
+00:00:16.214 --> 00:00:20.847
+A later request can reuse idle environment A. Static initialization does not repeat on this warm path.
+
+5
+00:00:20.847 --> 00:00:23.466
+Request two reuses A in this example. Handler runs without another Init phase.
+
+6
+00:00:23.466 --> 00:00:28.098
+Request three overlaps request two. A is busy, so Lambda needs another environment for this on-demand Event Function.
+
+7
+00:00:28.098 --> 00:00:31.522
+Lambda creates environment B. B has its own Init phase, then handles request three.
+
+8
+00:00:31.522 --> 00:00:36.860
+If each environment opens a database connection, more environments can increase connection demand.
+
+9
+00:00:36.860 --> 00:00:38.975
+Defend a limit: bound concurrency, pool connections where suitable, and measure throttles and database saturation.
+
+10
+00:00:38.975 --> 00:00:43.708
+Lambda eventually shuts environments down. Do not store durable application state only in process memory or temporary files.

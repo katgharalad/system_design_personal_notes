@@ -3,22 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AWS Notes</title>
+  <meta name="description" content="AWS study modules and source-based notes.">
+  <title>AWS Notes — Modules</title>
   <style>
     :root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #17202a; background: #fff; }
+    * { box-sizing: border-box; }
     body { min-height: 100vh; margin: 0; }
     main { max-width: 760px; margin: 0 auto; padding: clamp(3rem, 10vh, 7rem) 1.25rem; }
     a { color: #135d86; }
     a:focus-visible { outline: 3px solid #0b6e99; outline-offset: 3px; }
     h1 { margin: 2rem 0 .5rem; color: #24415c; font-size: clamp(2rem, 5vw, 3rem); }
-    p { color: #52606d; }
+    p { color: #52606d; line-height: 1.5; }
+    .module { display: block; margin-top: 2rem; padding: 1.35rem; border: 1px solid #d8dee4; color: #24415c; text-decoration: none; }
+    .module:hover { border-color: #24415c; }
+    .module strong { display: block; font-size: 1.25rem; }
+    .module span { display: block; margin-top: .5rem; color: #52606d; }
+    .eyebrow { color: #c54b18; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
   </style>
 </head>
 <body>
   <main>
     <a href="../">← Choose a book</a>
     <h1>AWS Notes</h1>
-    <p>Notes will be added here later.</p>
+    <p>Choose a study module.</p>
+    <a class="module" href="compute/">
+      <span class="eyebrow">Module 01</span>
+      <strong>Compute</strong>
+      <span>Start with compute fundamentals. Read lessons, test decisions, and practice interview questions.</span>
+    </a>
   </main>
 </body>
 </html>

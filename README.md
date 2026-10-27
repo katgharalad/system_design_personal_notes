@@ -6,7 +6,9 @@
 
 Read all 20 topics as a [simplified HTML lecture book](book/index.html).
 
-The site is ready for Vercel. Import this repository as a static project. Keep the project root at the repository root. No build command or environment variables are required. The root page lets readers choose the System Design Primer book or the AWS Notes placeholder.
+The site is ready for Vercel. Import this repository as a static project. Keep the project root at the repository root. No build command or environment variables are required. The root page lets readers choose the System Design Primer book or the AWS Notes module index.
+
+AWS Compute lives at [aws/compute/](aws/compute/index.html). Its React/TypeScript source is in `aws/compute-app/`; generated static files in `aws/compute/` are part of the deployable site. To edit it, run `npm ci` and `npm run build` in `aws/compute-app/`. Unit 1 is a Draft textbook section with five expanded chapters and 50 sourced interview questions. Unit 3 now has a Draft Lambda lifecycle lesson with a Manim animation, four prediction checkpoints, a separate React concurrency lab, and four linked interview questions. The guided mock interview, decision lab, and two-AZ architecture exercise remain available. See `aws/compute-app/COVERAGE.md` for content QA and known gaps. Other units are listed as planned inside the app. Source links and AWS guide update dates are in `aws/compute-app/src/sources.json`; regenerate that file with `npm run sources` from `aws/compute-app/`. Manim source, storyboards, render commands, and cache details are in [animations/README.md](animations/README.md).
 
 Local preview: run `python3 -m http.server 4173`, then open `http://127.0.0.1:4173/`.
 

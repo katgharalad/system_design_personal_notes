@@ -1,0 +1,47 @@
+{
+  "id": "lambda-execution-lifecycle-v1",
+  "title": "Lambda execution lifecycle",
+  "lessonId": "lambda-lifecycle",
+  "interviewSequence": ["L01", "L02", "L03", "L04"],
+  "status": "technically reviewed against AWS documentation",
+  "scene": "LambdaLifecycle",
+  "sceneFile": "scenes/lambda_lifecycle.py",
+  "timingFile": "lambda-timing.json",
+  "posterAtSeconds": 6,
+  "objectives": [
+    "Place Init before the first handler Invoke.",
+    "Explain why a later invocation may reuse an idle environment.",
+    "Explain why overlapping invokes need another environment for a standard Event Function.",
+    "Connect environment growth to downstream database connection pressure.",
+    "Explain eventual Shutdown and why process state is not durable."
+  ],
+  "assumptions": [
+    "Standard on-demand Lambda Event Function with synchronous direct invocation; this is not Lambda Managed Instances or Lambda Web Functions.",
+    "Lambda has no ready environment for request 1, retains A for request 2, and has capacity to create B for request 3. These are illustrated outcomes, not guarantees.",
+    "Horizontal distances and video duration are conceptual. They do not assert AWS latency or scaling times.",
+    "Each active environment may open one database connection in this example; actual application behavior may differ.",
+    "The database lane illustrates connection demand, not the timing of SQL calls or database execution."
+  ],
+  "hinglish": "Request 1 ke liye A ka Init hota hai, phir handler Invoke. A idle bache to request 2 use reuse kar sakti hai. Jab A busy ho aur request 3 aaye, standard Event Function ko B jaisa alag environment chahiye. B apna Init karta hai. Do active invokes ka matlab do database connection demands bhi ho sakte hain; DB limit separate measure karo.",
+  "sources": [
+    {"id":"lambda-execution","url":"https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtime-environment.html","supports":"Init, Invoke, freeze/reuse, reset, shutdown"},
+    {"id":"lambda-concurrency","url":"https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html","supports":"one active invoke per standard Event Function environment, concurrency and controls"},
+    {"id":"rds-proxy","url":"https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.howitworks.html","supports":"connection pooling and downstream limits"}
+  ],
+  "chapters": [
+    {"id":"arrival","mark":"opening","title":"First request","lessonAnchor":"problem-a-fast-api-with-a-slow-first-response"},
+    {"id":"init","mark":"init","title":"New environment: Init","lessonAnchor":"internal-model-one-environment-and-one-active-invocation"},
+    {"id":"invoke","mark":"first-invoke","title":"Handler: Invoke","lessonAnchor":"internal-model-one-environment-and-one-active-invocation"},
+    {"id":"reuse","mark":"reuse","title":"Possible warm reuse","lessonAnchor":"worked-example-1-one-cold-one-warm-then-overlap"},
+    {"id":"overlap","mark":"overlap","title":"Overlapping requests","lessonAnchor":"worked-example-1-one-cold-one-warm-then-overlap"},
+    {"id":"database","mark":"database","title":"Database pressure","lessonAnchor":"worked-example-2-load-and-the-database-limit"},
+    {"id":"defense","mark":"defense","title":"Defend a capacity limit","lessonAnchor":"alternatives-and-interview-reasoning"},
+    {"id":"shutdown","mark":"shutdown","title":"Eventual Shutdown","lessonAnchor":"internal-model-one-environment-and-one-active-invocation"}
+  ],
+  "checkpoints": [
+    {"id":"handler","mark":"predict-handler","prompt":"Before request 1 runs its handler, what must finish?","options":["The environment's Init phase","Request 2's handler","Environment shutdown"],"answerIndex":0,"feedback":"Sahi. New environment pehle runtime aur static code initialize karta hai; phir handler Invoke hota hai.","questionId":"L01"},
+    {"id":"reuse","mark":"predict-reuse","prompt":"If request 2 reuses idle A, does normal static Init run again?","options":["Yes, on every invocation","No, A can invoke without repeating Init","Only if the database is full"],"answerIndex":1,"feedback":"Sahi. Warm reuse par normal Init repeat nahi hoti. Reuse itself guaranteed nahi hai.","questionId":"L02"},
+    {"id":"overlap","mark":"predict-concurrency","prompt":"A is still processing request 2. Where can request 3 run?","options":["Inside A at the same time","In another environment B, if capacity permits","Only after A shuts down"],"answerIndex":1,"feedback":"Sahi. Standard Event Function mein ek environment ek active invoke handle karta hai. B ko apna Init chahiye.","questionId":"L02"},
+    {"id":"capacity","mark":"predict-capacity","prompt":"Two environments can each open a DB connection. If all DB slots are used, what should you examine first?","options":["Only raise Lambda concurrency","Bound demand and measure DB saturation","Assume a warm start solves connections"],"answerIndex":1,"feedback":"Sahi. Compute scaling DB capacity nahi banati. Cap, pooling, query load aur caller throttles measure karo.","questionId":"L03"}
+  ]
+}
