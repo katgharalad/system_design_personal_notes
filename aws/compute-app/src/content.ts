@@ -1,6 +1,8 @@
+export type UnitId = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10';
+export type UnitEntry = readonly [UnitId, string, string];
 export type Lesson = {
   id: string;
-  unit?: '01' | '03';
+  unit?: UnitId;
   title: string;
   purpose: string;
   prerequisite: string;
@@ -22,7 +24,7 @@ export type Lesson = {
   quick: string[];
 };
 
-export const units = [
+const baseUnits: UnitEntry[] = [
   ['01', 'Compute fundamentals', 'Draft: five expanded chapters; review in progress'],
   ['02', 'EC2 deep dive', 'Planned'],
   ['03', 'Serverless and Lambda', 'Draft: Lambda lifecycle lesson and visual lab'],
@@ -33,7 +35,9 @@ export const units = [
   ['08', 'Supporting infrastructure', 'Planned'],
   ['09', 'Hybrid and specialized workloads', 'Planned'],
   ['10', 'Architecture defense', 'Planned'],
-] as const;
+];
+const expandedUnitById = new Map(expandedUnits.map(unit=>[unit[0],unit]));
+export const units: UnitEntry[] = baseUnits.map(unit=>expandedUnitById.get(unit[0])??unit);
 
 export const lessons: Lesson[] = [
   {
@@ -144,4 +148,5 @@ export const lessons: Lesson[] = [
     exerciseCheck: ['Estimate = 30 active invokes.', 'DB connection budget may bind before compute quota.', 'Bounded test and caller-visible throttle tradeoff stated.'],
     quick: ['Init precedes first Invoke in a new environment.', 'Warm reuse is possible, not guaranteed.', 'Overlap needs another environment for standard Event Functions.', 'Bound compute using downstream capacity evidence.']
   }
-];
+, ...expandedLessons];
+import { expandedLessons, expandedUnits } from './content/aws-compute/catalog';

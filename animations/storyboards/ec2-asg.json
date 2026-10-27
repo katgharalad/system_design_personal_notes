@@ -1,0 +1,45 @@
+{
+  "id":"ec2-asg-capacity-v1",
+  "title":"EC2 Auto Scaling: desired, healthy, and N-1 capacity",
+  "lessonId":"ec2-asg",
+  "sceneFile":"scenes/ec2_asg.py",
+  "scene":"Ec2AutoScaling",
+  "timingFile":"ec2-asg-timing.json",
+  "posterAtSeconds":18,
+  "interviewSequence":["U02-Q038","U02-Q039","U02-Q043"],
+  "status":"technically reviewed against AWS documentation",
+  "objectives":[
+    "Distinguish desired capacity from pending, in-service, and ALB-healthy capacity.",
+    "Trace target metric change through launch, boot, readiness, registration, and health.",
+    "Explain how instance warmup differs from the health-check grace period.",
+    "Calculate whether an AZ failure leaves enough capacity for peak demand."
+  ],
+  "assumptions":[
+    "Illustrative target capacity is 100 RPS per healthy instance; actual throughput must be measured.",
+    "Demand changes from 800 to 1,600 RPS. Target tracking eventually requests 8 then 16 instances in the simplified model.",
+    "The two-AZ example places eight of sixteen instances in each AZ; exact ASG distribution and replacement timing depend on configuration and available capacity.",
+    "Instance startup, metric warmup, and health timing are conceptual and are not AWS timing guarantees.",
+    "The N-1 example deliberately has insufficient surviving capacity to make the failure consequence visible."
+  ],
+  "hinglish":"Demand double hone par target tracking desired capacity badha sakta hai, par nayi instance ko boot, app ready, register aur healthy hona padta hai. Desired count ready capacity nahi hai. Warmup scaling metric ko startup ke beech sahi interpret karne mein madad karta hai; health grace replacement timing ka alag control hai. AZ fail ho to bachi capacity ko peak RPS se compare karo. Eight survivors × 100 RPS sirf 800 RPS serve karte hain; 1,600 RPS ke liye N-1 margin nahi hai.",
+  "sources":[
+    {"id":"asg-target","url":"https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html","supports":"target tracking policy behavior"},
+    {"id":"asg-health","url":"https://docs.aws.amazon.com/autoscaling/ec2/userguide/health-checks-overview.html","supports":"health checks and instance replacement"},
+    {"id":"ec2-asg","url":"https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html","supports":"desired capacity and Auto Scaling Group behavior"},
+    {"id":"alb-health","url":"https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html","supports":"target health and unhealthy-target routing behavior"},
+    {"id":"asg-warmup","url":"https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-default-instance-warmup.html","supports":"warmup and dynamic scaling metric treatment"}
+  ],
+  "chapters":[
+    {"id":"baseline","mark":"baseline","title":"Baseline healthy fleet","lessonAnchor":"worked-example-1-rps","atSeconds":0},
+    {"id":"demand","mark":"demand-rise","title":"Demand rises; desired changes","lessonAnchor":"internal-operation","atSeconds":0},
+    {"id":"launch","mark":"launch","title":"Pending and booting","lessonAnchor":"execution-lifecycle","atSeconds":0},
+    {"id":"healthy","mark":"healthy","title":"Targets become healthy","lessonAnchor":"worked-example-1-rps","atSeconds":0},
+    {"id":"az-loss","mark":"az-loss","title":"AZ loss exposes N-1 gap","lessonAnchor":"production-checklist","atSeconds":0},
+    {"id":"defense","mark":"defense","title":"Defend capacity and admission","lessonAnchor":"practical-exercise","atSeconds":0}
+  ],
+  "checkpoints":[
+    {"id":"ready-capacity","mark":"predict-ramp","prompt":"Desired capacity changes from 8 to 16. Can ALB immediately route to 16 healthy targets?","options":["Yes; desired is instantly healthy","No; launch, boot, readiness, registration, and health take time","Only if CPU is under target"],"answerIndex":1,"feedback":"Sahi. Desired is a control target; only registered healthy capacity serves traffic.","questionId":"U02-Q040","atSeconds":0},
+    {"id":"warmup","mark":"predict-warmup","prompt":"Which setting governs when new instance metrics feed dynamic scaling decisions?","options":["Default instance warmup","ALB listener priority","EBS snapshot age"],"answerIndex":0,"feedback":"Sahi. Warmup affects scaling metric treatment; the health-check grace period governs a different replacement decision.","questionId":"U02-Q039","atSeconds":0},
+    {"id":"n1","mark":"predict-n1","prompt":"AZ B fails. Eight instances remain and demand is 1,600 RPS at 100 RPS each. What is the capacity gap?","options":["No gap; 8 × 100 = 1,600","800 RPS; survivors serve 800 of 1,600","1,600 RPS spare"],"answerIndex":1,"feedback":"Sahi. Eight survivors provide 800 RPS in this assumption, so the design needs more per-AZ capacity or an explicit buffering/degradation plan.","questionId":"U02-Q043","atSeconds":0}
+  ]
+}

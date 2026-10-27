@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:02.167 --> 00:00:04.000
+At 800 requests per second, the planning model needs eight healthy instances.
+
+2
+00:00:04.000 --> 00:00:08.833
+Demand doubles. Target tracking changes desired capacity from eight to sixteen, based on the selected metric.
+
+3
+00:00:08.833 --> 00:00:13.375
+Eight new instances are pending. They must launch, boot, initialize the app, register, and pass health checks.
+
+4
+00:00:13.375 --> 00:00:16.042
+After the measured startup interval, the new targets become healthy and can serve traffic.
+
+5
+00:00:16.042 --> 00:00:21.208
+An Availability Zone fails. If eight instances were in that zone, only eight remain for 1,600 requests per second.
+
+6
+00:00:21.208 --> 00:00:24.667
+Provision enough capacity per surviving AZ, or buffer and degrade work with an explicit latency contract.

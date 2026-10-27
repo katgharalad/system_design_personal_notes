@@ -3,6 +3,10 @@ import { advancedDepth } from './questions/advanced';
 import { explanationDepth } from './questions/explanations';
 import { followupGraph, oldConcepts, revisedAnswers } from './questions/details';
 import { lambdaQuestions } from './questions/lambda';
+import { lambdaExtraQuestions } from './questions/lambda-extra';
+import { ec2AuthoredQuestions } from './questions/ec2-authored';
+import { unit4AuthoredQuestions } from './questions/unit4-authored';
+import { expandedQuestions } from './content/aws-compute/question-bank';
 
 export type Question = {
   id: string;
@@ -19,7 +23,7 @@ export type Question = {
   sources: string[];
   concepts?: string[];
 };
-export type InterviewQuestion = Omit<Question, 'concepts'> & { concepts: string[]; unit: '01' | '03'; topic: string; difficultyLevel: 1 | 2 | 3 | 4 | 5; assessmentType: string; learningObjective: string; scenario: string; assumptions: string[]; followUps: [string,string]; prerequisites: string[]; revisionNotes: string[] };
+export type InterviewQuestion = Omit<Question, 'concepts'> & { concepts: string[]; unit: import('./content').UnitId; topic: string; difficultyLevel: 1 | 2 | 3 | 4 | 5; assessmentType: string; learningObjective: string; scenario: string; assumptions: string[]; followUps: [string,string]; prerequisites: string[]; revisionNotes: string[] };
 const originalQuestions: Question[] = [
   { id:'C01',lesson:'workload',difficulty:'Foundation',mode:'Recall',prompt:'What information do you need before choosing an AWS compute service for a new API?',answer:'I would record request rate and burst profile, execution duration, CPU and memory needs, latency and availability targets, state, downstream limits, security requirements, team capacity, and cost assumptions.',explanation:'Service name se pehle workload profile banao. Peak, p95, state aur database limits choice ko change karte hain.',rubric:['Names demand and burst profile','Names runtime/resource needs','Names nonfunctional and downstream constraints'],mistakes:['Choosing Lambda from traffic alone','Ignoring database capacity'],hint:'Think demand, work per request, and constraints.',followUp:'Which unknown would you measure first if peak traffic is ten times the average?',sources:['compute','wellarchitected-workload']},
   { id:'C02',lesson:'workload',difficulty:'Applied',mode:'Decision',prompt:'An endpoint gets 200 requests per second, and each request takes 250 ms on average. Estimate in-flight work. What could make the real peak higher?',answer:'The baseline estimate is 50 in-flight requests (200 × 0.25). Bursts, retries, tail latency, queues, and slow downstream calls can raise observed concurrency.',explanation:'Little’s Law estimate planning start hai. p95/p99 aur retry behavior bhi inspect karo.',rubric:['Calculates 50','Explains that it is an estimate','Names at least two sources of higher concurrency'],mistakes:['Using milliseconds as 250 seconds','Treating average as peak guarantee'],hint:'Convert 250 ms to seconds, then multiply.',followUp:'How would you validate this estimate in a load test?',sources:['compute']},
@@ -67,4 +71,4 @@ export const questions: InterviewQuestion[] = [...originalQuestions, ...extraQue
   followUps: followupGraph[q.id],
   prerequisites: prerequisites[q.lesson] ?? [],
   revisionNotes: [q.lesson]
-})).concat(lambdaQuestions);
+})).concat(lambdaQuestions, lambdaExtraQuestions, ec2AuthoredQuestions, expandedQuestions.map(q=>unit4AuthoredQuestions.find(authored=>authored.id===q.id)??q));

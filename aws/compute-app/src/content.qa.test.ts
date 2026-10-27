@@ -4,9 +4,10 @@ import { lessons, units } from './content';
 import { questions } from './questions';
 import { firstInterviewQuestion, nextInterviewQuestion, sessionPool } from './interview';
 import sourceData from './sources.json';
+import extraSourceData from './content/aws-compute/sources.json';
 import { spawnSync } from 'node:child_process';
 
-const sourceIds = new Set(sourceData.sources.map(x=>x.id));
+const sourceIds = new Set([...sourceData.sources.map(x=>x.id), ...extraSourceData.map(([id])=>id)]);
 const lessonIds = new Set(lessons.map(x=>x.id));
 const required = ['Learning objectives','Problem','Internal (?:model|operation)','Worked example 1','Worked example 2','Practical','Failure analysis','Alternatives','Exercises','Quick reference'];
 const objectiveTerms: Record<string,string[]> = {
@@ -24,7 +25,7 @@ describe('Unit 1 content gate', () => {
     for (const unit of units.slice(1)) expect(unit[2]).toMatch(/Planned|Draft/);
   });
   it('gives each lesson substantive chapter sections, calculations, and AWS evidence', () => {
-    for (const lesson of lessons.filter(item=>item.unit!=='03')) {
+    for (const lesson of lessons.filter(item=>item.unit==='01')) {
       const chapter = lessonText[lesson.id];
       expect(chapter,lesson.id).toBeTruthy();
       for (const section of required) expect(chapter,`${lesson.id}: ${section}`).toMatch(new RegExp(`^## .*${section}`,'mi'));
@@ -46,10 +47,11 @@ describe('Unit 1 content gate', () => {
   });
   it('keeps 50 Unit 1 questions and adds a sourced Lambda sequence', () => {
     expect(questions.filter(q=>q.unit==='01')).toHaveLength(50);
-    expect(questions.filter(q=>q.unit==='03')).toHaveLength(4);
+    expect(questions.filter(q=>q.unit==='03')).toHaveLength(60);
+    expect(questions).toHaveLength(425);
     expect(new Set(questions.map(q=>q.id)).size).toBe(questions.length);
     expect(new Set(questions.map(q=>q.prompt.toLowerCase().trim())).size).toBe(questions.length);
-    for (const lesson of lessons.filter(item=>item.unit!=='03')) expect(questions.filter(q=>q.lesson===lesson.id).length,lesson.id).toBe(10);
+    for (const lesson of lessons.filter(item=>item.unit==='01')) expect(questions.filter(q=>q.lesson===lesson.id).length,lesson.id).toBe(10);
     for (const q of questions) {
       expect(lessonIds.has(q.lesson),q.id).toBe(true);
       expect(q.unit).toBe(lessons.find(item=>item.id===q.lesson)?.unit??'01');

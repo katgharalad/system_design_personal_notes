@@ -1,0 +1,38 @@
+{
+  "id": "ecs-task-reconciliation-v1",
+  "title": "ECS task startup, health, and replacement",
+  "sceneFile": "scenes/ecs_reconciliation.py",
+  "scene": "EcsTaskReconciliation",
+  "timingFile": "ecs-task-reconciliation-timing.json",
+  "posterAtSeconds": 13,
+  "lessonId": "ecs-fundamentals",
+  "interviewSequence": ["U04-Q006", "U04-Q007", "U04-Q009"],
+  "status": "reviewed",
+  "objectives": [
+    "Distinguish task placement, startup, RUNNING state, container health, and ALB target health.",
+    "Separate ECS execution-role actions from application task-role permissions.",
+    "Diagnose replacement loops by locating the failing lifecycle stage."
+  ],
+  "assumptions": [
+    "Illustrative ECS service desired count is two; animation timing is not an AWS guarantee.",
+    "Task A starts but the configured ALB readiness path returns HTTP 404.",
+    "Task B image pull fails because its execution role lacks the required permission.",
+    "A service replacement uses the same task-definition revision until an operator changes it."
+  ],
+  "hinglish": "ECS desired count maintain karta hai, par RUNNING ka matlab healthy target nahi. Image pull, process startup, container health aur ALB probe alag stages hain. Failure ka exact reason pakdo; same bad revision ko replace karne se loop repeat hota hai. Execution role task setup ke liye hai; task role app calls ke liye.",
+  "sources": [
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/healthcheck.html",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-circuit-breaker.html"
+  ],
+  "chapters": [
+    {"id":"desired","mark":"desired","title":"Desired state and placement","lessonAnchor":"definition-and-terminology","atSeconds":0},
+    {"id":"startup","mark":"startup","title":"Image pull and process startup","lessonAnchor":"execution-lifecycle","atSeconds":0},
+    {"id":"health","mark":"target-check","title":"RUNNING is not ALB healthy","lessonAnchor":"failure-analysis","atSeconds":0},
+    {"id":"recovery","mark":"recovery","title":"Find the failing lifecycle stage","lessonAnchor":"debugging-procedure","atSeconds":0}
+  ],
+  "checkpoints": [
+    {"id":"running-health","mark":"predict-health","prompt":"Task is RUNNING. Can the ALB route user traffic to it?","options":["Yes; RUNNING means healthy","Not until it is registered and passes target health","Only if the execution role can write logs"],"answerIndex":1,"feedback":"Correct. RUNNING is process state; ALB target registration and health are separate gates.","questionId":"U04-Q006","atSeconds":0},
+    {"id":"failure-stage","mark":"predict-fix","prompt":"What evidence distinguishes image startup failure from a running but unhealthy target?","options":["Only CPU utilization","Stopped reason and task events versus ALB target reason, port, path, and network rules","The desired task count alone"],"answerIndex":1,"feedback":"Correct. Use lifecycle-specific evidence; desired count does not identify the failing stage.","questionId":"U04-Q006","atSeconds":0}
+  ]
+}

@@ -68,7 +68,7 @@ export function AnimationPlayer({ animation, onQuestion, onLab }: {
         <track kind="captions" src={animation.captions} srcLang="en" label="English explanation" />
       </video>
     </div>
-    {captions && <p className="animation-caption" aria-label="Animation caption">{currentCue?.text ?? 'Captions begin with the first request.'}</p>}
+    {captions && <p className="animation-caption" aria-label="Animation caption">{currentCue?.text ?? 'Pause at each checkpoint and predict the next event.'}</p>}
     {checkpoint && <div ref={checkpointRef} className="animation-checkpoint" role="group" aria-label="Prediction checkpoint">
         <strong>Predict before video continues</strong>
         <p>{checkpoint.prompt}</p>
@@ -86,7 +86,7 @@ export function AnimationPlayer({ animation, onQuestion, onLab }: {
       <button type="button" onClick={()=>video.current?.requestFullscreen?.()}>Full screen</button>
     </div>
     <div className="animation-chapters"><h4>Chapters and lesson links</h4><ol>{animation.chapters.map(chapter=><li key={chapter.id}><button type="button" onClick={()=>seek(chapter.atSeconds)} disabled={chapter.atSeconds>unlocked}>{format(chapter.atSeconds)} · {chapter.title}</button><a href={`#${chapter.lessonAnchor}`}>Read section ↓</a></li>)}</ol></div>
-    <p className="assumption">Illustration: standard on-demand Event Function. Timing is conceptual. Warm reuse and new environment availability are example outcomes.</p>
+    <p className="assumption">{animation.assumptions.join(' ')}</p>
     <div className="button-row">{onLab&&<button type="button" onClick={onLab}>Change assumptions in Lambda lab →</button>}<button type="button" onClick={()=>onQuestion(animation.interviewSequence[0])}>Start interview sequence {animation.interviewSequence[0]} → {animation.interviewSequence.at(-1)}</button></div>
   </section>;
 }

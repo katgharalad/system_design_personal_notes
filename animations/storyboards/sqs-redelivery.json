@@ -1,0 +1,43 @@
+{
+  "id": "lambda-sqs-redelivery-v1",
+  "title": "SQS redelivery and idempotency",
+  "lessonId": "lambda-retries-integrations",
+  "sceneFile": "scenes/sqs_redelivery.py",
+  "scene": "SqsRedelivery",
+  "timingFile": "sqs-redelivery-timing.json",
+  "posterAtSeconds": 19,
+  "interviewSequence": ["L40", "L41", "L43", "L46"],
+  "status": "technically reviewed against AWS documentation",
+  "objectives": [
+    "Explain that an SQS event source mapping polls and batches records.",
+    "Trace how a batch failure can replay records whose side effects already committed.",
+    "Explain the partial batch response boundary and its ordering assumptions.",
+    "Design an atomic idempotency key and a bounded poison-record path."
+  ],
+  "assumptions": [
+    "Standard SQS queue with a Lambda event source mapping; records can be delivered more than once.",
+    "A, B, and C are independent records for the partial-batch illustration; ordered-stream semantics are out of scope.",
+    "Database commit for A and B occurs before the invocation reports failure for C.",
+    "Visibility duration is conceptual. Configure it using current AWS guidance for the function timeout and batching window.",
+    "Partial batch response reduces unnecessary replay; it does not make delivery exactly once."
+  ],
+  "hinglish": "Event source mapping SQS ko poll karke batch banati hai. Agar A aur B ka DB write commit ho gaya, lekin C fail hua, whole batch failure par A aur B phir deliver ho sakte hain. Partial batch response mein sirf failed message IDs return karo. Phir bhi visibility timeout ke baad C dobara aa sakta hai. Isliye business key par atomic idempotency, bounded retry, DLQ, aur queue-age monitoring saath design karo.",
+  "sources": [
+    {"id":"lambda-event-source-mapping","url":"https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html","supports":"poll-based event source mapping and queue/stream delivery"},
+    {"id":"lambda-sqs-errors","url":"https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html","supports":"batch failure and partial batch response behavior"},
+    {"id":"lambda-sqs-config","url":"https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html","supports":"SQS mapping and visibility timeout configuration"},
+    {"id":"sqs-visibility","url":"https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html","supports":"message invisibility and redelivery after visibility expiry"}
+  ],
+  "chapters": [
+    {"id":"receive","mark":"receive","title":"Mapping polls a batch","lessonAnchor":"retry-ownership-by-invocation-type","atSeconds":0},
+    {"id":"process","mark":"process","title":"Some side effects commit","lessonAnchor":"batch-semantics-and-partial-failure","atSeconds":0},
+    {"id":"whole-batch","mark":"whole-batch","title":"Whole-batch replay","lessonAnchor":"worked-example-3-timeout-after-a-committed-write","atSeconds":0},
+    {"id":"partial","mark":"partial-response","title":"Return only failed IDs","lessonAnchor":"batch-semantics-and-partial-failure","atSeconds":0},
+    {"id":"visibility","mark":"visibility","title":"Visibility expiry and redelivery","lessonAnchor":"configuration-lab-sqs-retry-controls","atSeconds":0},
+    {"id":"idempotency","mark":"idempotency","title":"Make the effect duplicate-safe","lessonAnchor":"idempotency-design","atSeconds":0}
+  ],
+  "checkpoints": [
+    {"id":"duplicate-side-effect","mark":"predict-duplicate","prompt":"A and B committed, but the batch reports failure for C. What protects A and B if they are delivered again?","options":["The Lambda process remains warm","An atomic idempotency key in durable storage","A longer visibility timeout"],"answerIndex":1,"feedback":"Sahi. Visibility controls when retry can happen; atomic durable idempotency controls duplicate business effects.","questionId":"L44","atSeconds":0},
+    {"id":"partial-response","mark":"partial-response","prompt":"With independent SQS records and partial batch response enabled, what should the handler return?","options":["All message IDs","Only the failed message IDs","An empty response even if C failed"],"answerIndex":1,"feedback":"Return failed item identifiers only. Confirm independence and ordering semantics before using this pattern.","questionId":"L40","atSeconds":0}
+  ]
+}

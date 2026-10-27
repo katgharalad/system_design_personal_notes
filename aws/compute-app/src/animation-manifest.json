@@ -2,6 +2,308 @@
   "schemaVersion": 1,
   "animations": [
     {
+      "id": "ec2-asg-capacity-v1",
+      "title": "EC2 Auto Scaling: desired, healthy, and N-1 capacity",
+      "lessonId": "ec2-asg",
+      "interviewSequence": [
+        "U02-Q038",
+        "U02-Q039",
+        "U02-Q043"
+      ],
+      "status": "technically reviewed against AWS documentation",
+      "objectives": [
+        "Distinguish desired capacity from pending, in-service, and ALB-healthy capacity.",
+        "Trace target metric change through launch, boot, readiness, registration, and health.",
+        "Explain how instance warmup differs from the health-check grace period.",
+        "Calculate whether an AZ failure leaves enough capacity for peak demand."
+      ],
+      "assumptions": [
+        "Illustrative target capacity is 100 RPS per healthy instance; actual throughput must be measured.",
+        "Demand changes from 800 to 1,600 RPS. Target tracking eventually requests 8 then 16 instances in the simplified model.",
+        "The two-AZ example places eight of sixteen instances in each AZ; exact ASG distribution and replacement timing depend on configuration and available capacity.",
+        "Instance startup, metric warmup, and health timing are conceptual and are not AWS timing guarantees.",
+        "The N-1 example deliberately has insufficient surviving capacity to make the failure consequence visible."
+      ],
+      "hinglish": "Demand double hone par target tracking desired capacity badha sakta hai, par nayi instance ko boot, app ready, register aur healthy hona padta hai. Desired count ready capacity nahi hai. Warmup scaling metric ko startup ke beech sahi interpret karne mein madad karta hai; health grace replacement timing ka alag control hai. AZ fail ho to bachi capacity ko peak RPS se compare karo. Eight survivors \u00d7 100 RPS sirf 800 RPS serve karte hain; 1,600 RPS ke liye N-1 margin nahi hai.",
+      "sources": [
+        {
+          "id": "asg-target",
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html",
+          "supports": "target tracking policy behavior"
+        },
+        {
+          "id": "asg-health",
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/health-checks-overview.html",
+          "supports": "health checks and instance replacement"
+        },
+        {
+          "id": "ec2-asg",
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+          "supports": "desired capacity and Auto Scaling Group behavior"
+        },
+        {
+          "id": "alb-health",
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html",
+          "supports": "target health and unhealthy-target routing behavior"
+        },
+        {
+          "id": "asg-warmup",
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-default-instance-warmup.html",
+          "supports": "warmup and dynamic scaling metric treatment"
+        }
+      ],
+      "mp4": "/aws/compute/animations/ec2-asg-capacity-v1.mp4",
+      "webm": "/aws/compute/animations/ec2-asg-capacity-v1.webm",
+      "poster": "/aws/compute/animations/ec2-asg-capacity-v1-poster.png",
+      "captions": "/aws/compute/animations/ec2-asg-capacity-v1.vtt",
+      "duration": 24.666667,
+      "cues": [
+        {
+          "atSeconds": 2.167,
+          "endSeconds": 4.0,
+          "text": "At 800 requests per second, the planning model needs eight healthy instances."
+        },
+        {
+          "atSeconds": 4.0,
+          "endSeconds": 8.833,
+          "text": "Demand doubles. Target tracking changes desired capacity from eight to sixteen, based on the selected metric."
+        },
+        {
+          "atSeconds": 8.833,
+          "endSeconds": 13.375,
+          "text": "Eight new instances are pending. They must launch, boot, initialize the app, register, and pass health checks."
+        },
+        {
+          "atSeconds": 13.375,
+          "endSeconds": 16.042,
+          "text": "After the measured startup interval, the new targets become healthy and can serve traffic."
+        },
+        {
+          "atSeconds": 16.042,
+          "endSeconds": 21.208,
+          "text": "An Availability Zone fails. If eight instances were in that zone, only eight remain for 1,600 requests per second."
+        },
+        {
+          "atSeconds": 21.208,
+          "endSeconds": 24.667,
+          "text": "Provision enough capacity per surviving AZ, or buffer and degrade work with an explicit latency contract."
+        }
+      ],
+      "chapters": [
+        {
+          "id": "baseline",
+          "mark": "baseline",
+          "title": "Baseline healthy fleet",
+          "lessonAnchor": "worked-example-1-rps",
+          "atSeconds": 2.167
+        },
+        {
+          "id": "demand",
+          "mark": "demand-rise",
+          "title": "Demand rises; desired changes",
+          "lessonAnchor": "internal-operation",
+          "atSeconds": 4.0
+        },
+        {
+          "id": "launch",
+          "mark": "launch",
+          "title": "Pending and booting",
+          "lessonAnchor": "execution-lifecycle",
+          "atSeconds": 8.833
+        },
+        {
+          "id": "healthy",
+          "mark": "healthy",
+          "title": "Targets become healthy",
+          "lessonAnchor": "worked-example-1-rps",
+          "atSeconds": 13.375
+        },
+        {
+          "id": "az-loss",
+          "mark": "az-loss",
+          "title": "AZ loss exposes N-1 gap",
+          "lessonAnchor": "production-checklist",
+          "atSeconds": 16.042
+        },
+        {
+          "id": "defense",
+          "mark": "defense",
+          "title": "Defend capacity and admission",
+          "lessonAnchor": "practical-exercise",
+          "atSeconds": 21.208
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "ready-capacity",
+          "mark": "predict-ramp",
+          "prompt": "Desired capacity changes from 8 to 16. Can ALB immediately route to 16 healthy targets?",
+          "options": [
+            "Yes; desired is instantly healthy",
+            "No; launch, boot, readiness, registration, and health take time",
+            "Only if CPU is under target"
+          ],
+          "answerIndex": 1,
+          "feedback": "Sahi. Desired is a control target; only registered healthy capacity serves traffic.",
+          "questionId": "U02-Q040",
+          "atSeconds": 6.417
+        },
+        {
+          "id": "warmup",
+          "mark": "predict-warmup",
+          "prompt": "Which setting governs when new instance metrics feed dynamic scaling decisions?",
+          "options": [
+            "Default instance warmup",
+            "ALB listener priority",
+            "EBS snapshot age"
+          ],
+          "answerIndex": 0,
+          "feedback": "Sahi. Warmup affects scaling metric treatment; the health-check grace period governs a different replacement decision.",
+          "questionId": "U02-Q039",
+          "atSeconds": 10.958
+        },
+        {
+          "id": "n1",
+          "mark": "predict-n1",
+          "prompt": "AZ B fails. Eight instances remain and demand is 1,600 RPS at 100 RPS each. What is the capacity gap?",
+          "options": [
+            "No gap; 8 \u00d7 100 = 1,600",
+            "800 RPS; survivors serve 800 of 1,600",
+            "1,600 RPS spare"
+          ],
+          "answerIndex": 1,
+          "feedback": "Sahi. Eight survivors provide 800 RPS in this assumption, so the design needs more per-AZ capacity or an explicit buffering/degradation plan.",
+          "questionId": "U02-Q043",
+          "atSeconds": 18.792
+        }
+      ]
+    },
+    {
+      "id": "ecs-task-reconciliation-v1",
+      "title": "ECS task startup, health, and replacement",
+      "lessonId": "ecs-fundamentals",
+      "interviewSequence": [
+        "U04-Q006",
+        "U04-Q007",
+        "U04-Q009"
+      ],
+      "status": "reviewed",
+      "objectives": [
+        "Distinguish task placement, startup, RUNNING state, container health, and ALB target health.",
+        "Separate ECS execution-role actions from application task-role permissions.",
+        "Diagnose replacement loops by locating the failing lifecycle stage."
+      ],
+      "assumptions": [
+        "Illustrative ECS service desired count is two; animation timing is not an AWS guarantee.",
+        "Task A starts but the configured ALB readiness path returns HTTP 404.",
+        "Task B image pull fails because its execution role lacks the required permission.",
+        "A service replacement uses the same task-definition revision until an operator changes it."
+      ],
+      "hinglish": "ECS desired count maintain karta hai, par RUNNING ka matlab healthy target nahi. Image pull, process startup, container health aur ALB probe alag stages hain. Failure ka exact reason pakdo; same bad revision ko replace karne se loop repeat hota hai. Execution role task setup ke liye hai; task role app calls ke liye.",
+      "sources": [
+        "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html",
+        "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/healthcheck.html",
+        "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-circuit-breaker.html"
+      ],
+      "mp4": "/aws/compute/animations/ecs-task-reconciliation-v1.mp4",
+      "webm": "/aws/compute/animations/ecs-task-reconciliation-v1.webm",
+      "poster": "/aws/compute/animations/ecs-task-reconciliation-v1-poster.png",
+      "captions": "/aws/compute/animations/ecs-task-reconciliation-v1.vtt",
+      "duration": 16.416667,
+      "cues": [
+        {
+          "atSeconds": 1.833,
+          "endSeconds": 3.25,
+          "text": "The ECS service wants two tasks. A task definition specifies image, resources, networking, roles, and health checks."
+        },
+        {
+          "atSeconds": 3.25,
+          "endSeconds": 6.125,
+          "text": "Task A pulls its image and starts. Task B cannot pull because the execution role lacks registry permission."
+        },
+        {
+          "atSeconds": 6.125,
+          "endSeconds": 8.458,
+          "text": "Predict: Task A is RUNNING. Can the ALB route user traffic to it yet?"
+        },
+        {
+          "atSeconds": 8.458,
+          "endSeconds": 11.375,
+          "text": "The ALB registers Task A's IP, but its /ready probe returns 404. The task is running, yet the target is unhealthy."
+        },
+        {
+          "atSeconds": 11.375,
+          "endSeconds": 13.708,
+          "text": "Predict: what evidence separates a startup failure from a running but unhealthy target?"
+        },
+        {
+          "atSeconds": 13.708,
+          "endSeconds": 16.417,
+          "text": "Fix the execution role and readiness path. A replacement reaches RUNNING, passes its probe, and becomes routable."
+        }
+      ],
+      "chapters": [
+        {
+          "id": "desired",
+          "mark": "desired",
+          "title": "Desired state and placement",
+          "lessonAnchor": "definition-and-terminology",
+          "atSeconds": 1.833
+        },
+        {
+          "id": "startup",
+          "mark": "startup",
+          "title": "Image pull and process startup",
+          "lessonAnchor": "execution-lifecycle",
+          "atSeconds": 3.25
+        },
+        {
+          "id": "health",
+          "mark": "target-check",
+          "title": "RUNNING is not ALB healthy",
+          "lessonAnchor": "failure-analysis",
+          "atSeconds": 8.458
+        },
+        {
+          "id": "recovery",
+          "mark": "recovery",
+          "title": "Find the failing lifecycle stage",
+          "lessonAnchor": "debugging-procedure",
+          "atSeconds": 13.708
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "running-health",
+          "mark": "predict-health",
+          "prompt": "Task is RUNNING. Can the ALB route user traffic to it?",
+          "options": [
+            "Yes; RUNNING means healthy",
+            "Not until it is registered and passes target health",
+            "Only if the execution role can write logs"
+          ],
+          "answerIndex": 1,
+          "feedback": "Correct. RUNNING is process state; ALB target registration and health are separate gates.",
+          "questionId": "U04-Q006",
+          "atSeconds": 6.125
+        },
+        {
+          "id": "failure-stage",
+          "mark": "predict-fix",
+          "prompt": "What evidence distinguishes image startup failure from a running but unhealthy target?",
+          "options": [
+            "Only CPU utilization",
+            "Stopped reason and task events versus ALB target reason, port, path, and network rules",
+            "The desired task count alone"
+          ],
+          "answerIndex": 1,
+          "feedback": "Correct. Use lifecycle-specific evidence; desired count does not identify the failing stage.",
+          "questionId": "U04-Q006",
+          "atSeconds": 11.375
+        }
+      ]
+    },
+    {
       "id": "lambda-execution-lifecycle-v1",
       "title": "Lambda execution lifecycle",
       "lessonId": "lambda-lifecycle",
@@ -215,6 +517,165 @@
           "feedback": "Sahi. Compute scaling DB capacity nahi banati. Cap, pooling, query load aur caller throttles measure karo.",
           "questionId": "L03",
           "atSeconds": 34.443
+        }
+      ]
+    },
+    {
+      "id": "lambda-sqs-redelivery-v1",
+      "title": "SQS redelivery and idempotency",
+      "lessonId": "lambda-retries-integrations",
+      "interviewSequence": [
+        "L40",
+        "L41",
+        "L43",
+        "L46"
+      ],
+      "status": "technically reviewed against AWS documentation",
+      "objectives": [
+        "Explain that an SQS event source mapping polls and batches records.",
+        "Trace how a batch failure can replay records whose side effects already committed.",
+        "Explain the partial batch response boundary and its ordering assumptions.",
+        "Design an atomic idempotency key and a bounded poison-record path."
+      ],
+      "assumptions": [
+        "Standard SQS queue with a Lambda event source mapping; records can be delivered more than once.",
+        "A, B, and C are independent records for the partial-batch illustration; ordered-stream semantics are out of scope.",
+        "Database commit for A and B occurs before the invocation reports failure for C.",
+        "Visibility duration is conceptual. Configure it using current AWS guidance for the function timeout and batching window.",
+        "Partial batch response reduces unnecessary replay; it does not make delivery exactly once."
+      ],
+      "hinglish": "Event source mapping SQS ko poll karke batch banati hai. Agar A aur B ka DB write commit ho gaya, lekin C fail hua, whole batch failure par A aur B phir deliver ho sakte hain. Partial batch response mein sirf failed message IDs return karo. Phir bhi visibility timeout ke baad C dobara aa sakta hai. Isliye business key par atomic idempotency, bounded retry, DLQ, aur queue-age monitoring saath design karo.",
+      "sources": [
+        {
+          "id": "lambda-event-source-mapping",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html",
+          "supports": "poll-based event source mapping and queue/stream delivery"
+        },
+        {
+          "id": "lambda-sqs-errors",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html",
+          "supports": "batch failure and partial batch response behavior"
+        },
+        {
+          "id": "lambda-sqs-config",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html",
+          "supports": "SQS mapping and visibility timeout configuration"
+        },
+        {
+          "id": "sqs-visibility",
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html",
+          "supports": "message invisibility and redelivery after visibility expiry"
+        }
+      ],
+      "mp4": "/aws/compute/animations/lambda-sqs-redelivery-v1.mp4",
+      "webm": "/aws/compute/animations/lambda-sqs-redelivery-v1.webm",
+      "poster": "/aws/compute/animations/lambda-sqs-redelivery-v1-poster.png",
+      "captions": "/aws/compute/animations/lambda-sqs-redelivery-v1.vtt",
+      "duration": 20.208333,
+      "cues": [
+        {
+          "atSeconds": 1.833,
+          "endSeconds": 4.625,
+          "text": "The event source mapping polls SQS and receives a batch. It is not one push per record."
+        },
+        {
+          "atSeconds": 4.625,
+          "endSeconds": 6.833,
+          "text": "The handler commits A and B. C fails before its side effect completes."
+        },
+        {
+          "atSeconds": 6.833,
+          "endSeconds": 11.667,
+          "text": "Without partial batch response, a failed batch can make A and B visible again too."
+        },
+        {
+          "atSeconds": 11.667,
+          "endSeconds": 14.417,
+          "text": "With partial batch response, acknowledge A and B and return only C as failed."
+        },
+        {
+          "atSeconds": 14.417,
+          "endSeconds": 16.958,
+          "text": "If C is not deleted before visibility expires, it can be received again; duplicates remain possible."
+        },
+        {
+          "atSeconds": 16.958,
+          "endSeconds": 20.208,
+          "text": "Use atomic idempotency for side effects, set visibility from timeout guidance, and route poison records to a DLQ."
+        }
+      ],
+      "chapters": [
+        {
+          "id": "receive",
+          "mark": "receive",
+          "title": "Mapping polls a batch",
+          "lessonAnchor": "retry-ownership-by-invocation-type",
+          "atSeconds": 1.833
+        },
+        {
+          "id": "process",
+          "mark": "process",
+          "title": "Some side effects commit",
+          "lessonAnchor": "batch-semantics-and-partial-failure",
+          "atSeconds": 4.625
+        },
+        {
+          "id": "whole-batch",
+          "mark": "whole-batch",
+          "title": "Whole-batch replay",
+          "lessonAnchor": "worked-example-3-timeout-after-a-committed-write",
+          "atSeconds": 6.833
+        },
+        {
+          "id": "partial",
+          "mark": "partial-response",
+          "title": "Return only failed IDs",
+          "lessonAnchor": "batch-semantics-and-partial-failure",
+          "atSeconds": 11.667
+        },
+        {
+          "id": "visibility",
+          "mark": "visibility",
+          "title": "Visibility expiry and redelivery",
+          "lessonAnchor": "configuration-lab-sqs-retry-controls",
+          "atSeconds": 14.417
+        },
+        {
+          "id": "idempotency",
+          "mark": "idempotency",
+          "title": "Make the effect duplicate-safe",
+          "lessonAnchor": "idempotency-design",
+          "atSeconds": 16.958
+        }
+      ],
+      "checkpoints": [
+        {
+          "id": "duplicate-side-effect",
+          "mark": "predict-duplicate",
+          "prompt": "A and B committed, but the batch reports failure for C. What protects A and B if they are delivered again?",
+          "options": [
+            "The Lambda process remains warm",
+            "An atomic idempotency key in durable storage",
+            "A longer visibility timeout"
+          ],
+          "answerIndex": 1,
+          "feedback": "Sahi. Visibility controls when retry can happen; atomic durable idempotency controls duplicate business effects.",
+          "questionId": "L44",
+          "atSeconds": 9.25
+        },
+        {
+          "id": "partial-response",
+          "mark": "partial-response",
+          "prompt": "With independent SQS records and partial batch response enabled, what should the handler return?",
+          "options": [
+            "All message IDs",
+            "Only the failed message IDs",
+            "An empty response even if C failed"
+          ],
+          "answerIndex": 1,
+          "feedback": "Return failed item identifiers only. Confirm independence and ordering semantics before using this pattern.",
+          "questionId": "L40",
+          "atSeconds": 11.667
         }
       ]
     }

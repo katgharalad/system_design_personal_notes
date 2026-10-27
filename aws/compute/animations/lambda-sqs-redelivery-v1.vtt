@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:01.833 --> 00:00:04.625
+The event source mapping polls SQS and receives a batch. It is not one push per record.
+
+2
+00:00:04.625 --> 00:00:06.833
+The handler commits A and B. C fails before its side effect completes.
+
+3
+00:00:06.833 --> 00:00:11.667
+Without partial batch response, a failed batch can make A and B visible again too.
+
+4
+00:00:11.667 --> 00:00:14.417
+With partial batch response, acknowledge A and B and return only C as failed.
+
+5
+00:00:14.417 --> 00:00:16.958
+If C is not deleted before visibility expires, it can be received again; duplicates remain possible.
+
+6
+00:00:16.958 --> 00:00:20.208
+Use atomic idempotency for side effects, set visibility from timeout guidance, and route poison records to a DLQ.

@@ -12,7 +12,13 @@ export function nextInterviewQuestion(current: InterviewQuestion, score: number,
     a.id.localeCompare(b.id)
   )[0];
 }
-export function sessionPool(topic: string): InterviewQuestion[] { return topic === 'all' ? questions : questions.filter(q => q.lesson === topic); }
+export function sessionPool(topic: string, availableIds?: string[]): InterviewQuestion[] {
+  if (topic === 'all') return questions;
+  if (topic.startsWith('unit:')) return questions.filter(q => q.unit === topic.slice(5));
+  if (topic.startsWith('mode:')) return questions.filter(q => q.assessmentType === topic.slice(5));
+  if (topic === 'missed') return questions.filter(q => availableIds?.includes(q.id));
+  return questions.filter(q => q.lesson === topic);
+}
 export function firstInterviewQuestion(topic: string, difficulty: number): InterviewQuestion | undefined {
   return sessionPool(topic).slice().sort((a,b)=>Math.abs(a.difficultyLevel-difficulty)-Math.abs(b.difficultyLevel-difficulty)||a.id.localeCompare(b.id))[0];
 }

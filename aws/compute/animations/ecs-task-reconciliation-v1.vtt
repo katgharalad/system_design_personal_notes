@@ -1,0 +1,25 @@
+WEBVTT
+
+1
+00:00:01.833 --> 00:00:03.250
+The ECS service wants two tasks. A task definition specifies image, resources, networking, roles, and health checks.
+
+2
+00:00:03.250 --> 00:00:06.125
+Task A pulls its image and starts. Task B cannot pull because the execution role lacks registry permission.
+
+3
+00:00:06.125 --> 00:00:08.458
+Predict: Task A is RUNNING. Can the ALB route user traffic to it yet?
+
+4
+00:00:08.458 --> 00:00:11.375
+The ALB registers Task A's IP, but its /ready probe returns 404. The task is running, yet the target is unhealthy.
+
+5
+00:00:11.375 --> 00:00:13.708
+Predict: what evidence separates a startup failure from a running but unhealthy target?
+
+6
+00:00:13.708 --> 00:00:16.417
+Fix the execution role and readiness path. A replacement reaches RUNNING, passes its probe, and becomes routable.

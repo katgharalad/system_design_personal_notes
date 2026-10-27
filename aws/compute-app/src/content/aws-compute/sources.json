@@ -1,0 +1,427 @@
+[
+  [
+    "ec2-instance-types",
+    "Amazon EC2 instance types",
+    "https://docs.aws.amazon.com/ec2/latest/instancetypes/instance-types.html"
+  ],
+  [
+    "ec2-instance-lifecycle",
+    "Amazon EC2 instance lifecycle",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html"
+  ],
+  [
+    "ec2-ami",
+    "Amazon Machine Images",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html"
+  ],
+  [
+    "ec2-userdata",
+    "Run commands on your Linux instance at launch",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html"
+  ],
+  [
+    "ec2-launch-template",
+    "Launch templates",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/launch-templates.html"
+  ],
+  [
+    "ebs-volumes",
+    "Amazon EBS volumes",
+    "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html"
+  ],
+  [
+    "ebs-snapshots",
+    "Amazon EBS snapshots",
+    "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html"
+  ],
+  [
+    "ec2-security-groups",
+    "Control traffic to your AWS resources using security groups",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
+  ],
+  [
+    "ec2-networking",
+    "Amazon EC2 instance networking",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-instance-addressing.html"
+  ],
+  [
+    "ec2-ssm",
+    "Connect to your Linux instance using Session Manager",
+    "https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html"
+  ],
+  [
+    "ec2-alb",
+    "What is an Application Load Balancer?",
+    "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+  ],
+  [
+    "ec2-asg",
+    "What is Amazon EC2 Auto Scaling?",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html"
+  ],
+  [
+    "ec2-troubleshoot",
+    "Troubleshoot Amazon EC2 instances",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/TroubleshootingInstances.html"
+  ],
+  [
+    "ec2-cloudwatch",
+    "Monitor your instances using CloudWatch",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch.html"
+  ],
+  [
+    "ecr-user-guide",
+    "What is Amazon ECR?",
+    "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html"
+  ],
+  [
+    "ecs-services",
+    "Amazon ECS services",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_services.html"
+  ],
+  [
+    "ecs-task-networking",
+    "Amazon ECS task networking",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html"
+  ],
+  [
+    "ecs-deployments",
+    "Amazon ECS deployment types",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html"
+  ],
+  [
+    "eks-architecture",
+    "Amazon EKS architecture",
+    "https://docs.aws.amazon.com/eks/latest/userguide/eks-architecture.html"
+  ],
+  [
+    "eks-compute",
+    "Manage compute resources by using nodes",
+    "https://docs.aws.amazon.com/eks/latest/userguide/eks-compute.html"
+  ],
+  [
+    "eks-pod-identity",
+    "Assign IAM roles to Kubernetes service accounts",
+    "https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html"
+  ],
+  [
+    "eks-kubernetes",
+    "Kubernetes concepts",
+    "https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-concepts.html"
+  ],
+  [
+    "apprunner-guide",
+    "What is AWS App Runner?",
+    "https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html"
+  ],
+  [
+    "apprunner-availability",
+    "AWS App Runner availability change",
+    "https://docs.aws.amazon.com/apprunner/latest/dg/apprunner-availability-change.html"
+  ],
+  [
+    "ecs-express-mode",
+    "Amazon ECS Express Mode",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/express-mode.html"
+  ],
+  [
+    "serverless-guide",
+    "Choosing an AWS serverless service",
+    "https://docs.aws.amazon.com/decision-guides/latest/decision-guides/choosing-aws-serverless-service.html"
+  ],
+  [
+    "batch-user-guide",
+    "What is AWS Batch?",
+    "https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html"
+  ],
+  [
+    "modern-apps",
+    "Modern applications strategy on AWS",
+    "https://docs.aws.amazon.com/decision-guides/latest/decision-guides/modern-apps-strategy-on-aws-how-to-choose.html"
+  ],
+  [
+    "eventbridge-user-guide",
+    "What is Amazon EventBridge?",
+    "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+  ],
+  [
+    "apigateway-user-guide",
+    "What is Amazon API Gateway?",
+    "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
+  ],
+  [
+    "cost-explorer",
+    "What is AWS Cost Explorer?",
+    "https://docs.aws.amazon.com/cost-management/latest/userguide/what-is-cost-explorer.html"
+  ],
+  [
+    "ec2-pricing",
+    "Amazon EC2 On-Demand pricing",
+    "https://aws.amazon.com/ec2/pricing/on-demand/"
+  ],
+  [
+    "ec2-reserved-instances",
+    "Reserved Instances",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-reserved-instances.html"
+  ],
+  [
+    "savings-plans",
+    "Savings Plans",
+    "https://docs.aws.amazon.com/savingsplans/latest/userguide/what-is-savings-plans.html"
+  ],
+  [
+    "spot-interruptions",
+    "Spot Instance interruptions",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-instance-termination-notices.html"
+  ],
+  [
+    "ec2-capacity-reservations",
+    "On-Demand Capacity Reservations",
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-capacity-reservations.html"
+  ],
+  [
+    "compute-optimizer",
+    "What is AWS Compute Optimizer?",
+    "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html"
+  ],
+  [
+    "lambda-pricing",
+    "AWS Lambda pricing",
+    "https://aws.amazon.com/lambda/pricing/"
+  ],
+  [
+    "fargate-pricing",
+    "AWS Fargate pricing",
+    "https://aws.amazon.com/fargate/pricing/"
+  ],
+  [
+    "vpc-user-guide",
+    "What is Amazon VPC?",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+  ],
+  [
+    "vpc-route-tables",
+    "Route tables for your VPC",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html"
+  ],
+  [
+    "vpc-nat-gateway",
+    "NAT gateways",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html"
+  ],
+  [
+    "vpc-endpoints",
+    "Access AWS services through AWS PrivateLink",
+    "https://docs.aws.amazon.com/vpc/latest/privatelink/vpc-endpoints.html"
+  ],
+  [
+    "vpc-security",
+    "Security in your VPC",
+    "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Security.html"
+  ],
+  [
+    "iam-roles",
+    "IAM roles",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
+  ],
+  [
+    "iam-policy-evaluation",
+    "Policy evaluation logic",
+    "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+  ],
+  [
+    "sqs-visibility",
+    "Amazon SQS visibility timeout",
+    "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html"
+  ],
+  [
+    "sns-user-guide",
+    "What is Amazon SNS?",
+    "https://docs.aws.amazon.com/sns/latest/dg/welcome.html"
+  ],
+  [
+    "s3-user-guide",
+    "What is Amazon S3?",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+  ],
+  [
+    "s3-event-notifications",
+    "Amazon S3 event notifications",
+    "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+  ],
+  [
+    "rds-user-guide",
+    "What is Amazon RDS?",
+    "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html"
+  ],
+  [
+    "cloudwatch-user-guide",
+    "What is Amazon CloudWatch?",
+    "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+  ],
+  [
+    "xray-user-guide",
+    "What is AWS X-Ray?",
+    "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html"
+  ],
+  [
+    "cloudformation-user-guide",
+    "What is AWS CloudFormation?",
+    "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html"
+  ],
+  [
+    "cdk-user-guide",
+    "What is the AWS CDK?",
+    "https://docs.aws.amazon.com/cdk/v2/guide/home.html"
+  ],
+  [
+    "batch-compute-environments",
+    "Compute environments for AWS Batch",
+    "https://docs.aws.amazon.com/batch/latest/userguide/compute_environments.html"
+  ],
+  [
+    "eks-ml",
+    "Manage compute for AI/ML workloads on EKS",
+    "https://docs.aws.amazon.com/eks/latest/userguide/ml-node-groups.html"
+  ],
+  [
+    "sagemaker-training",
+    "Train a model with Amazon SageMaker AI",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html"
+  ],
+  [
+    "sagemaker-inference",
+    "Deploy models for inference",
+    "https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html"
+  ],
+  [
+    "outposts-user-guide",
+    "What is AWS Outposts?",
+    "https://docs.aws.amazon.com/outposts/latest/userguide/what-is-outposts.html"
+  ],
+  [
+    "local-zones",
+    "AWS Local Zones",
+    "https://docs.aws.amazon.com/local-zones/latest/ug/what-is-local-zones.html"
+  ],
+  [
+    "wavelength-user-guide",
+    "What is AWS Wavelength?",
+    "https://docs.aws.amazon.com/wavelength/latest/developerguide/what-is-wavelength.html"
+  ],
+  [
+    "ecs-anywhere",
+    "Amazon ECS Anywhere",
+    "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-anywhere.html"
+  ],
+  [
+    "lambda-invocation-methods",
+    "Lambda invocation methods",
+    "https://docs.aws.amazon.com/lambda/latest/dg/lambda-invocation.html"
+  ],
+  [
+    "lambda-event-architecture",
+    "Creating event-driven architectures with Lambda",
+    "https://docs.aws.amazon.com/lambda/latest/dg/concepts-event-driven-architectures.html"
+  ],
+  [
+    "lambda-event-source-mapping",
+    "How Lambda processes queue and stream records",
+    "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+  ],
+  [
+    "lambda-sqs-config",
+    "Create an SQS event source mapping",
+    "https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-configure.html"
+  ],
+  [
+    "lambda-sqs-errors",
+    "Handle errors for an SQS event source",
+    "https://docs.aws.amazon.com/lambda/latest/dg/services-sqs-errorhandling.html"
+  ],
+  [
+    "lambda-retry-behavior",
+    "Lambda invocation retry behavior",
+    "https://docs.aws.amazon.com/lambda/latest/dg/invocation-retries.html"
+  ],
+  [
+    "lambda-scaling-behavior",
+    "Lambda Event Function scaling behavior",
+    "https://docs.aws.amazon.com/lambda/latest/dg/scaling-behavior.html"
+  ],
+  [
+    "lambda-vpc-config",
+    "Connect Lambda functions to a VPC",
+    "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html"
+  ],
+  [
+    "lambda-env-config",
+    "Configure Lambda environment variables",
+    "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html"
+  ],
+  [
+    "lambda-execution-role",
+    "Lambda execution roles",
+    "https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html"
+  ],
+  [
+    "lambda-resource-policy",
+    "Lambda resource-based policies",
+    "https://docs.aws.amazon.com/lambda/latest/dg/access-control-resource-based.html"
+  ],
+  [
+    "lambda-monitoring",
+    "Monitor Lambda functions",
+    "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-functions.html"
+  ],
+  [
+    "lambda-versions",
+    "Lambda versions",
+    "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html"
+  ],
+  [
+    "lambda-aliases",
+    "Lambda aliases",
+    "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html"
+  ],
+  [
+    "lambda-deployment",
+    "Lambda deployment best practices",
+    "https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html"
+  ],
+  [
+    "lambda-durable-concepts",
+    "Lambda durable function concepts",
+    "https://docs.aws.amazon.com/lambda/latest/dg/durable-basic-concepts.html"
+  ],
+  [
+    "lambda-durable-config",
+    "Configure durable Lambda functions",
+    "https://docs.aws.amazon.com/lambda/latest/dg/durable-configuration.html"
+  ],
+  [
+    "lambda-rds-proxy",
+    "RDS Proxy connection behavior",
+    "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.howitworks.html"
+  ],
+  [
+    "lambda-api-gateway",
+    "Invoke Lambda through API Gateway",
+    "https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html"
+  ],
+  [
+    "lambda-function-urls",
+    "Lambda function URLs",
+    "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html"
+  ],
+  [
+    "lambda-async-errors",
+    "Handle errors for asynchronous Lambda invocation",
+    "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-error-handling.html"
+  ],
+  [
+    "asg-warmup",
+    "Set the default instance warmup for an Auto Scaling group",
+    "https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-default-instance-warmup.html"
+  ]
+]

@@ -8,7 +8,7 @@ import { lessons } from './content';
 import { questions } from './questions';
 import { calculateLambda } from './LambdaSimulator';
 
-const asset = manifest.animations[0];
+const asset = manifest.animations.find(item=>item.id==='lambda-execution-lifecycle-v1')!;
 const root = fileURLToPath(new URL('../public/', import.meta.url));
 const physical = (url: string) => root + url.replace('/aws/compute/','');
 
@@ -49,7 +49,7 @@ describe('Lambda visual learning workflow', () => {
     }
     expect(asset.chapters.map(x=>x.atSeconds)).toEqual([...asset.chapters.map(x=>x.atSeconds)].sort((a,b)=>a-b));
     expect(asset.checkpoints.map(x=>x.atSeconds)).toEqual([...asset.checkpoints.map(x=>x.atSeconds)].sort((a,b)=>a-b));
-    expect(asset.sources.every(source=>source.url.startsWith('https://docs.aws.amazon.com/'))).toBe(true);
+    expect(asset.sources.every(source=>(typeof source==='string'?source:source.url).startsWith('https://docs.aws.amazon.com/'))).toBe(true);
   });
   it('links the four question sequence and checks the separate calculation model', () => {
     const path = ['L01','L02','L03','L04'];

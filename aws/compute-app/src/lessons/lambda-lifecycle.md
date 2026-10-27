@@ -64,6 +64,16 @@ Provisioned concurrency addresses cold-start latency for pre-initialized capacit
 3. A database supports 25 useful connections and each active invocation can open one. What can a reserved concurrency cap of 20 protect? What user-visible failure could it cause?
 4. A handler writes a row, then times out before responding. What retry and idempotency questions will you ask before increasing concurrency?
 
+## Roman Hinglish explanation
+
+Har Lambda request ke liye pehle ye dekho ki environment ready hai ya nahi. Naya environment ho to runtime aur handler ke bahar ka code pehle load hota hai: ye Init hai. Uske baad hi handler event par kaam karta hai: ye Invoke hai. Kaam khatam hone ke baad Lambda environment ko thodi der rakh sakta hai, aur baad ki request use kar sakti hai. Lekin kitni der rahega, ye tumhara contract nahi hai; isliye process memory ya `/tmp` mein durable state mat rakho.
+
+Ek environment ek waqt mein ek standard Event Function invocation process karta hai. Request 2 aayi aur A idle tha to A reuse ho sakta hai. Request 3, request 2 ke dauran aa jaaye to Lambda ko B jaisa alag environment banana padta hai, agar capacity aur scaling limit allow kare. Isi liye warm reuse latency improve kar sakta hai, par burst ke liye concurrency planning phir bhi chahiye.
+
+Concurrency ka estimate arrival rate × average duration hai. 120 request/sec × 0.25 sec = lagbhag 30 active invocation. Ye sirf pehla estimate hai: p99 duration, retries, burst aur dependency wait actual need badha sakte hain. Agar har active invocation database connection pakde to 30 connection ki demand ho sakti hai. Database ke 20 slots hain to Lambda quota badhaana galat fix hai. Safe cap, pooling, queue, ya query improvement ko workload contract ke hisaab se choose karo aur load test karo. Provisioned concurrency pre-initialized capacity deta hai; reserved concurrency allocation aur ceiling control karta hai. Dono ek doosre ke badle nahi hain.
+
+Animation timeline conceptual hai. Uski length se actual cold-start latency infer mat karo. Logs mein Init Duration, Duration, request ID aur dependency spans ko alag padho. Throttle, timeout, aur handler error alag symptoms hain. Pehle invocation type aur metric timeline banao, phir change karo.
+
 ## Quick reference
 
 - Standard Event Function: one active request per execution environment.
