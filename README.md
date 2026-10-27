@@ -6,7 +6,7 @@
 
 Read all 20 topics as a [simplified HTML lecture book](book/index.html).
 
-The book is ready for Vercel. Import this repository as a static project. Keep the project root at the repository root. No build command or environment variables are required. The deployed root redirects to `/book/`.
+The site is ready for Vercel. Import this repository as a static project. Keep the project root at the repository root. No build command or environment variables are required. The root page lets readers choose the System Design Primer book or the AWS Notes placeholder.
 
 Local preview: run `python3 -m http.server 4173`, then open `http://127.0.0.1:4173/`.
 
